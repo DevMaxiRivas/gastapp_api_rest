@@ -1,4 +1,4 @@
-package com.example;
+package com.app;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.boot.SpringApplication;

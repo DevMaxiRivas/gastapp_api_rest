@@ -1,6 +1,6 @@
-package com.example.model;
+package com.app.model;
 
-import com.example.enums.user.CurrencyType;
+import com.app.enums.user.CurrencyType;
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;

@@ -1,18 +1,21 @@
-package com.example.model;
-import com.example.enums.transaction.TransactionType;
+package com.app.model;
+import com.app.enums.transaction.TransactionType;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.SQLRestriction;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "transactions")
 // Necessary for service
-@SQLDelete(sql = "UPDATE transactions SET deleted = true WHERE id = ?")
+@SQLDelete(sql = "UPDATE transactions SET deletedAt = CURRENT_TIMESTAMP WHERE id = ?")
 // Necessary for service
-@Where(clause = "deleted = false")
+// @SQLRestriction("deleted_at IS NULL")
+@Filter(name = "softDeleteFilter", condition = "(:isDeleted = false and deleted_at IS NULL)")
 @Getter
 @Setter
 @NoArgsConstructor
