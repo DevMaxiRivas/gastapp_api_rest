@@ -1,3 +1,8 @@
 package com.app.dto.category;
 
-public record CategoryResponseDTO(Long id, String name, String icon) {}
+public record CategoryRequestDTO(
+        Long id,
+        String name,
+        String icon,
+        Long userId
+) {}

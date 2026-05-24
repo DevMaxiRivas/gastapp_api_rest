@@ -1,4 +1,3 @@
 package com.app.dto.category;
 
-public class CategoryResponseDTO {
-}
+public record CategoryResponseDTO(Long id, String name, String icon) {}

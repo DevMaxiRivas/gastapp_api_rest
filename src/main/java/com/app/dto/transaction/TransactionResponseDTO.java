@@ -1,3 +1,8 @@
-package com.app.dto.user;
+package com.app.dto.transaction;
 
-public record TransactionResponseDTO(Long id, BigDecimal amount, String type, LocalDate date, String note, CategoryDTO category) {}
+import com.app.dto.category.CategoryResponseDTO;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
+public record TransactionResponseDTO(Long id, BigDecimal amount, String type, LocalDate date, String note, CategoryResponseDTO category) {}

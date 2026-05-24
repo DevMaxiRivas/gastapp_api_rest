@@ -3,6 +3,9 @@ package com.app.model;
 import com.app.enums.user.CurrencyType;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -36,5 +39,6 @@ public class User extends BaseEntity{
     private BigDecimal monthlyBudget;
 
     @Column(columnDefinition = "text[]")
+    @JdbcTypeCode(SqlTypes.ARRAY)
     private List<String> tokens;
 }

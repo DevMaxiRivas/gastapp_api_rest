@@ -1,4 +1,6 @@
 package com.app.dto.transaction;
 
-public class TransactionRequestDTO {
-}
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
+public record TransactionRequestDTO(BigDecimal amount, String type, LocalDate date, String note, Long categoryId) {}
