@@ -3,10 +3,10 @@ package com.app.exception;
 import lombok.Getter;
 
 @Getter
-public class ValidationException extends RuntimeException {
+public class ValidationRequestBodyException extends RuntimeException {
     private final String pointer;
 
-    public ValidationException(String message, String pointer) {
+    public ValidationRequestBodyException(String message, String pointer) {
         super(message);
         this.pointer = pointer;
     }

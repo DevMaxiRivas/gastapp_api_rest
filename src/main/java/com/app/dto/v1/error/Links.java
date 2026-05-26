@@ -1,4 +1,4 @@
-package com.app.dto.v1.errors;
+package com.app.dto.v1.error;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
