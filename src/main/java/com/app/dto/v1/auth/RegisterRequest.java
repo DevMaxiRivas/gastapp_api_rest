@@ -1,3 +1,21 @@
-package com.app.dto.auth;
+package com.app.dto.v1.auth;
 
-public record RegisterRequest(String name, String email, String password, String currency) {}
+import com.app.enums.user.CurrencyType;
+import jakarta.validation.constraints.*;
+
+public record RegisterRequest(
+        @NotNull()
+        @Size(min = 3)
+        String name,
+
+        @NotNull()
+        @Email()
+        String email,
+
+        @NotNull()
+        @Size(min = 8)
+        String password,
+
+        @NotNull()
+        CurrencyType currency
+) {}

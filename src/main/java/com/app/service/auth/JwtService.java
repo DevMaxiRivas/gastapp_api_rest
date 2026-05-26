@@ -1,4 +1,4 @@
-package com.app.service;
+package com.app.service.auth;
 
 import com.app.model.User;
 import io.jsonwebtoken.Claims;

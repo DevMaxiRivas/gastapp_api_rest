@@ -1,3 +1,15 @@
-package com.app.dto.auth;
+package com.app.dto.v1.auth;
 
-public record LoginRequest(String email, String password) {}
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
+public record LoginRequest(
+        @NotNull
+        @Email
+        String email,
+
+        @NotNull
+        @Size(min = 8)
+        String password
+) {}

@@ -6,7 +6,11 @@ import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.List;
 
 @Entity
@@ -16,7 +20,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User extends BaseEntity{
+public class User extends BaseEntity implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,6 +43,23 @@ public class User extends BaseEntity{
     private BigDecimal monthlyBudget;
 
     @Column(columnDefinition = "text[]")
-    @JdbcTypeCode(SqlTypes.ARRAY)
     private List<String> tokens;
+
+    // --- UserDetails for Auth---
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of();
+    }
+
+    @Override
+    public String getUsername() { return email; }
+
+    @Override
+    public boolean isAccountNonExpired()  { return true; }
+    @Override
+    public boolean isAccountNonLocked()   { return true; }
+    @Override
+    public boolean isCredentialsNonExpired() { return true; }
+    @Override
+    public boolean isEnabled()            { return true; }
 }
