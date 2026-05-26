@@ -3,41 +3,81 @@ package com.app.features.controller;
 import com.app.config.AbstractIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-class UserControllerTest extends AbstractIntegrationTest {
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureWebTestClient
+class AuthControllerTest extends AbstractIntegrationTest {
 
     @Autowired
     private WebTestClient webTestClient;
 
     @Test
-    void debeGuardarYConsultarUnUsuario() {
-        // Objeto de prueba
-        String nuevoUsuarioJson = """
+    void registerUserTest() {
+        webTestClient.post()
+                .uri("/api/v1/auth/register")
+                .header("Content-Type", "application/json")
+                .bodyValue("""
                 {
-                    "name" : "Maxi",
-                    "email" : "algo@ex.com",
+                    "name" : "TestUser",
+                    "email" : "test@example.com",
                     "currency" : "USD",
                     "password" : "Pwd12345"
                 }
-                """;
-
-        // 1. Probar el POST (Creación)
-        webTestClient.post()
-                .uri("/api/auth")
-                .header("Content-Type", "application/json")
-                .bodyValue(nuevoUsuarioJson)
+                """)
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody()
-                .jsonPath("$.id").exists()
-                .jsonPath("$.nombre").isEqualTo("Juan Perez");
+                    .jsonPath("$.data.token").exists()
+                    .jsonPath("$.data.name").isEqualTo("TestUser")
+                    .jsonPath("$.data.email").isEqualTo("test@example.com")
+        ;
 
-        // 2. Probar el GET (Persistencia real en Postgres)
-        webTestClient.get()
-                .uri("/api/usuarios")
+        // Testing Error Enum CurrencyType
+        webTestClient.post()
+                .uri("/api/v1/auth/register")
+                .header("Content-Type", "application/json")
+                .bodyValue("""
+                {
+                    "name" : "TestUser",
+                    "email" : "test@example.com",
+                    "currency" : "UD",
+                    "password" : "Pwd12345"
+                }
+                """)
                 .exchange()
-                .expectStatus().isOk()
-                .expectBodyList(Object.class).hasSize(1);
+                .expectStatus().isEqualTo(HttpStatus.BAD_REQUEST)
+                .expectBody()
+                .jsonPath("$.errors").exists()
+                .jsonPath("$.status").isEqualTo("error");
+        ;
+
+        webTestClient.post()
+                .uri("/api/v1/auth/register")
+                .header("Content-Type", "application/json")
+                .bodyValue("""
+                {
+                    "name" : "TestUser",
+                    "email" : "test@example.com",
+                    "password" : "Pwd12345"
+                }
+                """)
+                .exchange()
+                .expectStatus().isEqualTo(HttpStatus.UNPROCESSABLE_CONTENT)
+                .expectBody()
+                .jsonPath("$.errors").exists()
+                .jsonPath("$.status").isEqualTo("error")
+        ;
+
+
+//        // 2. Probar el GET (Persistencia real en Postgres)
+//        webTestClient.get()
+//                .uri("/api/usuarios")
+//                .exchange()
+//                .expectStatus().isOk()
+//                .expectBodyList(Object.class).hasSize(1);
     }
 }
