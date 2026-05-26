@@ -1,6 +1,6 @@
-package com.app.dto.transaction;
+package com.app.dto.v1.transaction;
 
-import com.app.dto.category.CategoryResponseDTO;
+import com.app.dto.v1.category.CategoryResponseDTO;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

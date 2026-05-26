@@ -1,7 +1,7 @@
 package com.app.mapper.category;
 
-import com.app.dto.category.CategoryRequestDTO;
-import com.app.dto.category.CategoryResponseDTO;
+import com.app.dto.v1.category.CategoryRequestDTO;
+import com.app.dto.v1.category.CategoryResponseDTO;
 import com.app.model.Category;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

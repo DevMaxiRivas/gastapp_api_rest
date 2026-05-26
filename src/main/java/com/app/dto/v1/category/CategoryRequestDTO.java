@@ -1,4 +1,4 @@
-package com.app.dto.category;
+package com.app.dto.v1.category;
 
 public record CategoryRequestDTO(
         Long id,

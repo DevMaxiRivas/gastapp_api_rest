@@ -1,7 +1,7 @@
 package com.app.mapper.transaction;
 
-import com.app.dto.transaction.TransactionRequestDTO;
-import com.app.dto.transaction.TransactionResponseDTO;
+import com.app.dto.v1.transaction.TransactionRequestDTO;
+import com.app.dto.v1.transaction.TransactionResponseDTO;
 import com.app.mapper.category.CategoryMapper;
 import com.app.model.Transaction;
 import org.mapstruct.Mapper;
