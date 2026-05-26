@@ -1,11 +1,12 @@
 package com.app.service.category.impl;
 
-import com.app.dto.category.CategoryRequestDTO;
-import com.app.dto.category.CategoryResponseDTO;
-import com.app.mapper.category.CategoryMapper;
+//import com.app.dto.v1.category.CategoryRequestDTO;
+//import com.app.dto.v1.category.CategoryResponseDTO;
+//import com.app.mapper.category.CategoryMapper;
 import com.app.model.Category;
 import com.app.model.User;
 import com.app.repository.CategoryRepository;
+import com.app.service.category.CategoryService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,18 +15,16 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class CategoryServiceImpl {
-    private final CategoryRepository repo;
-    private final CategoryMapper mapper;
+public class CategoryServiceImpl implements CategoryService {
+    private final CategoryRepository categoryRepository;
 
-    public List<CategoryResponseDTO> getAvailableCategories(Long userId) {
-        return mapper.toDtoList(repo.findAllAvailableToUser(userId));
+    public List<Category> getAvailableCategories(Long userId) {
+        return categoryRepository.findAllAvailableToUser(userId);
     }
 
     @Transactional
-    public Category createCustomCategory(CategoryRequestDTO dto, User user) {
-        Category category = mapper.toEntity(dto);
+    public Category createCustomCategory(Category category, User user) {
         category.setUser(user);
-        return repo.save(category);
+        return categoryRepository.save(category);
     }
 }
