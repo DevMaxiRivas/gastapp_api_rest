@@ -4,12 +4,15 @@ import com.app.dto.v1.error.ErrorDetail;
 import com.app.dto.v1.error.ErrorResponse;
 import com.app.dto.v1.error.Links;
 import com.app.dto.v1.error.Source;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestCookieException;
+import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import tools.jackson.databind.exc.InvalidFormatException;
@@ -105,8 +108,6 @@ public class GlobalExceptionHandler {
 
             errorMessage = String.format("Invalid value '%s'. Accepted values are: %s",
                     invalidValue, acceptedValues);
-
-            System.out.println(errorMessage);
         }
 
         ErrorDetail error = ErrorDetail.builder()
@@ -127,9 +128,70 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(MissingRequestHeaderException.class)
+    public ResponseEntity<ErrorResponse> handleMissingHeader(MissingRequestHeaderException ex, HttpServletRequest request) {
+        ErrorDetail error = ErrorDetail.builder()
+                .status("BAD_REQUEST")
+                .code(HttpStatus.BAD_REQUEST.value())
+                .title("Invalid request")
+                .detail(ex.getHeaderName() + ": is required")
+                .source(new Source("headers"))
+                .links(new Links(request.getRequestURL().toString()))
+                .build();
+
+        return new ResponseEntity<>(
+                ErrorResponse.builder()
+                        .status("error")
+                        .errors(List.of(error))
+                        .build(),
+                HttpStatus.BAD_REQUEST
+        );
+    }
+
+    @ExceptionHandler(MissingRequestCookieException.class)
+    public ResponseEntity<ErrorResponse> handleMissingCookie(MissingRequestCookieException ex, HttpServletRequest request) {
+        ErrorDetail error = ErrorDetail.builder()
+                .status("BAD_REQUEST")
+                .code(HttpStatus.BAD_REQUEST.value())
+                .title("Invalid request")
+                .detail(ex.getCookieName() + ": is required")
+                .source(new Source("cookies"))
+                .links(new Links(request.getRequestURL().toString()))
+                .build();
+
+        return new ResponseEntity<>(
+                ErrorResponse.builder()
+                        .status("error")
+                        .errors(List.of(error))
+                        .build(),
+                HttpStatus.BAD_REQUEST
+        );
+    }
+
+    @ExceptionHandler(ExpiredJwtException.class)
+    public ResponseEntity<ErrorResponse> handleMissingCookie(ExpiredJwtException ex, HttpServletRequest request) {
+        ErrorDetail error = ErrorDetail.builder()
+                .status("UNAUTHORIZED")
+                .code(HttpStatus.UNAUTHORIZED.value())
+                .title("Authentication token expired")
+                .detail("jwt is expired")
+                .source(new Source("headers"))
+                .links(new Links(request.getRequestURL().toString()))
+                .build();
+
+        return new ResponseEntity<>(
+                ErrorResponse.builder()
+                        .status("error")
+                        .errors(List.of(error))
+                        .build(),
+                HttpStatus.BAD_REQUEST
+        );
+    }
+
     // Generic Error
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneralError(Exception ex, HttpServletRequest request) {
+        System.out.println(ex.getClass().getSimpleName());
         System.out.println(ex.getMessage());
         ErrorDetail error = ErrorDetail.builder()
                 .status("INTERNAL_SERVER_ERROR")
