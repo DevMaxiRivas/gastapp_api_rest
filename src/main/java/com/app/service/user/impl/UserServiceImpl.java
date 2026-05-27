@@ -7,6 +7,8 @@ import com.app.repository.UserRepository;
 import com.app.service.user.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -38,7 +40,8 @@ public class UserServiceImpl implements UserService {
         return repo.save(user);
     }
 
-    public List<UserResponseDTO> getUsers(){
-        return mapper.toDtoList(repo.findAll());
+    public Page<UserResponseDTO> getUsersPageable(Pageable pageable) {
+        Page<User> entityPage = repo.findAll(pageable);
+        return entityPage.map(mapper::toDto);
     }
 }
