@@ -1,10 +1,12 @@
 package com.app.service.auth;
 
 import com.app.dto.v1.auth.*;
-import com.app.enums.user.CurrencyType;
+import com.app.enums.token.TokenType;
 import com.app.exception.ValidationRequestBodyException;
 import com.app.model.User;
 import com.app.repository.UserRepository;
+import com.app.util.HashingUtils;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,9 +25,15 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authManager;
 
+    protected AuthResponse generateTokens(User user) {
+        String token = jwtService.generateToken(user, TokenType.ACCESS_TOKEN);
+        String refreshToken = jwtService.generateToken(user, TokenType.REFRESH_TOKEN);
+        return new AuthResponse(new AccessTokenResponse(token), refreshToken);
+    }
+
     public AuthResponse register(RegisterRequest request) {
         if (userRepo.findByEmail(request.email()).isPresent()) {
-            throw new ValidationRequestBodyException("email: is already in use", "body/email" );
+            throw new ValidationRequestBodyException("email: is already in use", "body.email" );
         }
 
         User user = User.builder()
@@ -36,15 +44,17 @@ public class AuthService {
                 .tokens(List.of())
                 .build();
 
-        String token = jwtService.generateToken(user);
-        user.setTokens(List.of(token));
+        AuthResponse authResponse = generateTokens(user);
+        user.setTokens(List.of(
+                HashingUtils.hashToken(authResponse.refreshToken())
+        ));
         userRepo.save(user);
 
-        return new AuthResponse(token, user.getEmail(), user.getName());
+        return authResponse;
     }
 
+    @Transactional
     public AuthResponse login(LoginRequest request) {
-        System.out.println("Check Credentials");
         authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.email(),
@@ -52,30 +62,38 @@ public class AuthService {
                 )
         );
 
-        System.out.println("Login Success");
-
         User user = userRepo.findByEmail(request.email())
-                .orElseThrow(() -> new ValidationRequestBodyException("User not found", "body/email"));
+                .orElseThrow(() -> new ValidationRequestBodyException("User not found", "body.email"));
 
-        String token = jwtService.generateToken(user);
+        AuthResponse authResponse = generateTokens(user);
 
         List<String> currentTokens = user.getTokens() != null ? user.getTokens() : new ArrayList<String>();
-        currentTokens.add(token);
+        currentTokens.add(
+                HashingUtils.hashToken(authResponse.refreshToken())
+        );
+
         user.setTokens(currentTokens);
         userRepo.save(user);
-
-        return new AuthResponse(token, user.getEmail(), user.getName());
+        return authResponse;
     }
 
-    public void logout(String token) {
-        String email = jwtService.extractEmail(token);
+    @Transactional
+    public void logout(String refreshToken) {
+        String email = jwtService.extractEmail(new Token(refreshToken, TokenType.REFRESH_TOKEN));
         User user = userRepo.findByEmail(email)
-                .orElseThrow(() -> new ValidationRequestBodyException("User not found", "token/email"));
+                .orElseThrow(() -> new ValidationRequestBodyException("User not found", "token.email"));
 
-        List<String> updatedTokens = new ArrayList<>(user.getTokens());
-        updatedTokens.remove(token);
+        String hashToken = HashingUtils.hashToken(refreshToken);
+        userRepo.removeToken(user.getId(), hashToken);
+    }
 
-        user.setTokens(updatedTokens);
-        userRepo.save(user);
+    @Transactional
+    public AccessTokenResponse refresh(String refreshToken) {
+        String email = jwtService.extractEmail(new Token(refreshToken, TokenType.REFRESH_TOKEN));
+        User user = userRepo.findByEmail(email)
+                .orElseThrow(() -> new ValidationRequestBodyException("User not found", "token.email"));
+
+        String token = jwtService.generateToken(user, TokenType.ACCESS_TOKEN);
+        return new AccessTokenResponse(token);
     }
 }

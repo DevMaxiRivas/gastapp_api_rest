@@ -1,5 +1,7 @@
 package com.app.service.auth;
 
+import com.app.dto.v1.auth.Token;
+import com.app.enums.token.TokenType;
 import com.app.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -22,39 +24,53 @@ public class JwtService {
     @Value("${spring.application.jwt_secret_expiration}")
     private long expiration;
 
-    private SecretKey getSigningKey() {
-        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
+    @Value("${spring.application.jwt_refresh_secret}")
+    private String refreshSecretKey;
+
+    @Value("${spring.application.jwt_refresh_secret_expiration}")
+    private long refreshExpiration;
+
+    private SecretKey getSigningKey(TokenType tokenType) {
+        if (tokenType == TokenType.ACCESS_TOKEN) {
+            return Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
+        }
+
+        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(refreshSecretKey));
     }
 
-    public String generateToken(User user) {
+    private long getDurationToken(TokenType tokenType){
+        if (tokenType == TokenType.ACCESS_TOKEN) return expiration;
+        return  refreshExpiration;
+    }
+
+    public String generateToken(User user, TokenType tokenType) {
         return Jwts.builder()
                 .subject(user.getEmail())
                 .claim("id", user.getId())
                 .claim("name", user.getName())
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(getSigningKey())
+                .expiration(new Date(System.currentTimeMillis() + getDurationToken(tokenType)))
+                .signWith(getSigningKey(tokenType))
                 .compact();
     }
 
-    public String extractEmail(String token) {
+    public String extractEmail(Token token) {
         return extractClaim(token, Claims::getSubject);
     }
 
-    public boolean isTokenValid(String token, UserDetails user) {
-        return extractEmail(token).equals(user.getUsername())
-                && !isTokenExpired(token);
+    public boolean isTokenValid(Token token, UserDetails user) {
+        return extractEmail(token).equals(user.getUsername()) && !isTokenExpired(token);
     }
 
-    private boolean isTokenExpired(String token) {
+    private boolean isTokenExpired(Token token) {
         return extractClaim(token, Claims::getExpiration).before(new Date());
     }
 
-    private <T> T extractClaim(String token, Function<Claims, T> resolver) {
+    private <T> T extractClaim(Token token, Function<Claims, T> resolver) {
         Claims claims = Jwts.parser()
-                .verifyWith(getSigningKey())
+                .verifyWith(getSigningKey(token.getTokenType()))
                 .build()
-                .parseSignedClaims(token)
+                .parseSignedClaims(token.getValue())
                 .getPayload();
         return resolver.apply(claims);
     }

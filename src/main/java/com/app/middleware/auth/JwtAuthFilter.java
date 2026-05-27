@@ -1,5 +1,7 @@
 package com.app.middleware.auth;
 
+import com.app.dto.v1.auth.Token;
+import com.app.enums.token.TokenType;
 import com.app.model.User;
 import com.app.repository.UserRepository;
 import com.app.service.auth.JwtService;
@@ -71,7 +73,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             FilterChain chain) throws ServletException,
             IOException
     {
-        System.out.println(request.getRequestURL().toString());
+        // System.out.println(request.getRequestURL().toString());
         String authHeader = request.getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -79,17 +81,16 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             return;
         }
 
-        String token = authHeader.substring(7);
+        Token token = new Token(
+                authHeader.substring(7),
+                TokenType.ACCESS_TOKEN
+        );
         String email = jwtService.extractEmail(token);
 
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             User user = userRepository.findByEmail(email).orElse(null);
 
-            boolean tokenInDb = user != null
-                    && user.getTokens() != null
-                    && user.getTokens().contains(token);
-
-            if (user != null && tokenInDb && jwtService.isTokenValid(token, user)) {
+            if (user != null && jwtService.isTokenValid(token, user)) {
                 UsernamePasswordAuthenticationToken auth =
                         new UsernamePasswordAuthenticationToken(
                                 user, null,

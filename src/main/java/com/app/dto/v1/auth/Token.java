@@ -2,11 +2,11 @@ package com.app.dto.v1.auth;
 
 import com.app.enums.token.TokenType;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 
-@Data
+@Getter
 @AllArgsConstructor
 public class Token {
-    private String token;
+    private String value;
     private TokenType tokenType;
 }
