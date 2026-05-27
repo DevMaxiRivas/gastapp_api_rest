@@ -86,5 +86,3 @@ Stores budgets for past periods and also allows defining the current month’s b
 * **The `categories` table with an optional `user_id`** allows starting with fixed global categories (`user_id = NULL`) and later enabling users to create their own categories without requiring migrations.
 * **Exchange rates are not modeled yet** because we assume each user operates in a single currency (configured in their profile). Future multi-currency versions would require either an exchange rate table or storing currency information per transaction.
 * **Automatic `updated_at` updates**: it is recommended to use a PostgreSQL trigger or handle it with `@PreUpdate` in JPA.
-
-Do you also need the complete DDL creation scripts or the JPA entities mapped in Java code?
