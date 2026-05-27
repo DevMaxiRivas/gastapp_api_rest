@@ -187,9 +187,28 @@
 						</goals>
 						<configuration>
 							<annotationProcessorPaths>
+<!--							Default Configuration-->
+<!--								<path>-->
+<!--									<groupId>org.projectlombok</groupId>-->
+<!--									<artifactId>lombok</artifactId>-->
+<!--								</path>-->
+								<!-- 1. Lombok -->
 								<path>
 									<groupId>org.projectlombok</groupId>
 									<artifactId>lombok</artifactId>
+									<version>1.18.30</version>
+								</path>
+								<!-- 2. MapStruct Processor -->
+								<path>
+									<groupId>org.mapstruct</groupId>
+									<artifactId>mapstruct-processor</artifactId>
+									<version>1.5.5.Final</version>
+								</path>
+								<!-- 3. Binding Lombok y MapStruct  -->
+								<path>
+									<groupId>org.projectlombok</groupId>
+									<artifactId>lombok-mapstruct-binding</artifactId>
+									<version>0.2.0</version>
 								</path>
 							</annotationProcessorPaths>
 						</configuration>
@@ -202,9 +221,28 @@
 						</goals>
 						<configuration>
 							<annotationProcessorPaths>
+							<!-- Default Configuration -->
+							<!-- <path>-->
+								<!-- <groupId>org.projectlombok</groupId>-->
+								<!-- <artifactId>lombok</artifactId>-->
+							<!-- </path>-->
+								<!-- 1. Lombok -->
 								<path>
 									<groupId>org.projectlombok</groupId>
 									<artifactId>lombok</artifactId>
+									<version>1.18.30</version>
+								</path>
+								<!-- 2. MapStruct Processor -->
+								<path>
+									<groupId>org.mapstruct</groupId>
+									<artifactId>mapstruct-processor</artifactId>
+									<version>1.5.5.Final</version>
+								</path>
+								<!-- 3. Binding e Lombok y MapStruct -->
+								<path>
+									<groupId>org.projectlombok</groupId>
+									<artifactId>lombok-mapstruct-binding</artifactId>
+									<version>0.2.0</version>
 								</path>
 							</annotationProcessorPaths>
 						</configuration>
