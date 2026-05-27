@@ -4,20 +4,31 @@ import com.app.dto.v1.error.ErrorDetail;
 import com.app.dto.v1.error.ErrorResponse;
 import com.app.dto.v1.error.Links;
 import com.app.dto.v1.error.Source;
+
+import com.app.exception.app.auth.BadCredentialsCustomException;
+import com.app.exception.app.auth.jwt.InvalidJwtCustomException;
+import com.app.exception.body.NotReadableBodyCustomException;
+import com.app.exception.cookie.MissingCookieCustomException;
+import com.app.exception.header.MissingHeaderCustomException;
+import com.app.exception.app.auth.jwt.ExpiredJwtCustomException;
+
+import com.app.exception.resource.ResourceNotFoundCustomException;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestCookieException;
 import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import tools.jackson.databind.exc.InvalidFormatException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -30,10 +41,7 @@ public class GlobalExceptionHandler {
 
     // 1. Validation Error Manager (ej. @Valid DTOs)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidationErrors(
-            MethodArgumentNotValidException ex,
-            HttpServletRequest request
-    ) {
+    public ResponseEntity<ErrorResponse> handleValidationErrors(MethodArgumentNotValidException ex, HttpServletRequest request) {
         List<ErrorDetail> errorDetails = ex
                 .getBindingResult()
                 .getFieldErrors()
@@ -58,134 +66,67 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.UNPROCESSABLE_CONTENT);
     }
 
-    @ExceptionHandler(ValidationRequestBodyException.class)
-    public ResponseEntity<ErrorResponse> handleManualValidation(ValidationRequestBodyException ex, HttpServletRequest request) {
-        ErrorDetail error = ErrorDetail.builder()
-                .status("VALIDATION_ERROR")
-                .code(HttpStatus.UNPROCESSABLE_CONTENT.value())
-                .title("Invalid request")
-                .detail(ex.getMessage())
-                .source(new Source(ex.getPointer()))
-                .links(new Links(request.getRequestURL().toString()))
-                .build();
+    private ResponseEntity<ErrorResponse> buildErrorResponse(
+            String status,
+            HttpStatus httpStatus,
+            String title,
+            String detail,
+            String pointer,
+            HttpServletRequest request) {
 
-        ErrorResponse response = ErrorResponse.builder()
-                .status("error")
-                .errors(List.of(error))
-                .build();
-
-        return new ResponseEntity<>(response, HttpStatus.UNPROCESSABLE_CONTENT);
-    }
-
-
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleNotFound(ResourceNotFoundException ex, HttpServletRequest request) {
-        ErrorDetail error = ErrorDetail.builder()
-                .status("NOT_FOUND")
-                .code(HttpStatus.NOT_FOUND.value())
-                .title("Resource not found")
-                .detail(ex.getMessage())
-                .source(new Source("url_parameter"))
+        ErrorDetail errorDetail = ErrorDetail.builder()
+                .status(status)
+                .code(httpStatus.value())
+                .title(title)
+                .detail(detail)
+                .source(new Source(pointer))
                 .links(new Links(request.getRequestURL().toString()))
                 .build();
 
         return new ResponseEntity<>(
-                ErrorResponse.builder()
-                        .status("error")
-                        .errors(List.of(error))
-                        .build(),
-                HttpStatus.NOT_FOUND
+                ErrorResponse.builder().status("error").errors(List.of(errorDetail)).build(),
+                httpStatus
         );
+    }
+
+    @ExceptionHandler(BaseException.class)
+    public ResponseEntity<ErrorResponse> handleBaseException(BaseException ex, HttpServletRequest request) {
+        return buildErrorResponse(ex.getStatus(),ex.getHttpStatus(),ex.getTitle(),ex.getMessage(),ex.getPointer(),request);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleNotReadableBody(HttpMessageNotReadableException ex, HttpServletRequest request) {
-        String errorMessage = ex.getMessage();
-        // Check if the root cause is an invalid enum value
-        if (ex.getCause() instanceof InvalidFormatException ife && ife.getTargetType().isEnum()) {
-            String invalidValue = ife.getValue().toString();
-            String acceptedValues = Arrays.toString(ife.getTargetType().getEnumConstants());
-
-            errorMessage = String.format("Invalid value '%s'. Accepted values are: %s",
-                    invalidValue, acceptedValues);
-        }
-
-        ErrorDetail error = ErrorDetail.builder()
-                .status("BAD_REQUEST")
-                .code(HttpStatus.BAD_REQUEST.value())
-                .title("Invalid request")
-                .detail(errorMessage)
-                .source(new Source("body"))
-                .links(new Links(request.getRequestURL().toString()))
-                .build();
-
-        return new ResponseEntity<>(
-                ErrorResponse.builder()
-                        .status("error")
-                        .errors(List.of(error))
-                        .build(),
-                HttpStatus.BAD_REQUEST
-        );
+        return handleBaseException(new NotReadableBodyCustomException(ex), request);
     }
 
     @ExceptionHandler(MissingRequestHeaderException.class)
     public ResponseEntity<ErrorResponse> handleMissingHeader(MissingRequestHeaderException ex, HttpServletRequest request) {
-        ErrorDetail error = ErrorDetail.builder()
-                .status("BAD_REQUEST")
-                .code(HttpStatus.BAD_REQUEST.value())
-                .title("Invalid request")
-                .detail(ex.getHeaderName() + ": is required")
-                .source(new Source("headers"))
-                .links(new Links(request.getRequestURL().toString()))
-                .build();
-
-        return new ResponseEntity<>(
-                ErrorResponse.builder()
-                        .status("error")
-                        .errors(List.of(error))
-                        .build(),
-                HttpStatus.BAD_REQUEST
-        );
+        return handleBaseException(new MissingHeaderCustomException(ex), request);
     }
 
     @ExceptionHandler(MissingRequestCookieException.class)
     public ResponseEntity<ErrorResponse> handleMissingCookie(MissingRequestCookieException ex, HttpServletRequest request) {
-        ErrorDetail error = ErrorDetail.builder()
-                .status("BAD_REQUEST")
-                .code(HttpStatus.BAD_REQUEST.value())
-                .title("Invalid request")
-                .detail(ex.getCookieName() + ": is required")
-                .source(new Source("cookies"))
-                .links(new Links(request.getRequestURL().toString()))
-                .build();
-
-        return new ResponseEntity<>(
-                ErrorResponse.builder()
-                        .status("error")
-                        .errors(List.of(error))
-                        .build(),
-                HttpStatus.BAD_REQUEST
-        );
+        return handleBaseException(new MissingCookieCustomException(ex), request);
     }
 
     @ExceptionHandler(ExpiredJwtException.class)
-    public ResponseEntity<ErrorResponse> handleMissingCookie(ExpiredJwtException ex, HttpServletRequest request) {
-        ErrorDetail error = ErrorDetail.builder()
-                .status("UNAUTHORIZED")
-                .code(HttpStatus.UNAUTHORIZED.value())
-                .title("Authentication token expired")
-                .detail("jwt is expired")
-                .source(new Source("headers"))
-                .links(new Links(request.getRequestURL().toString()))
-                .build();
+    public ResponseEntity<ErrorResponse> handleExpiredJwt(ExpiredJwtException ex, HttpServletRequest request) {
+        return handleBaseException(new ExpiredJwtCustomException(), request);
+    }
 
-        return new ResponseEntity<>(
-                ErrorResponse.builder()
-                        .status("error")
-                        .errors(List.of(error))
-                        .build(),
-                HttpStatus.BAD_REQUEST
-        );
+    @ExceptionHandler(SignatureException.class)
+    public ResponseEntity<ErrorResponse> handleSignatureError(SignatureException ex, HttpServletRequest request) {
+        return handleBaseException(new InvalidJwtCustomException(), request);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleBadCredentials(BadCredentialsException ex, HttpServletRequest request) {
+        return handleBaseException(new BadCredentialsCustomException(), request);
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNotResourceFound(NoResourceFoundException ex, HttpServletRequest request) {
+        return handleBaseException(new ResourceNotFoundCustomException("Resource not found", "url"), request);
     }
 
     // Generic Error

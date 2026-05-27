@@ -2,7 +2,7 @@ package com.app.service.auth;
 
 import com.app.dto.v1.auth.*;
 import com.app.enums.token.TokenType;
-import com.app.exception.ValidationRequestBodyException;
+import com.app.exception.body.ValidationRequestBodyCustomException;
 import com.app.model.User;
 import com.app.repository.UserRepository;
 import com.app.util.HashingUtils;
@@ -33,7 +33,7 @@ public class AuthService {
 
     public AuthResponse register(RegisterRequest request) {
         if (userRepo.findByEmail(request.email()).isPresent()) {
-            throw new ValidationRequestBodyException("email: is already in use", "body.email" );
+            throw new ValidationRequestBodyCustomException("email: is already in use", "body.email" );
         }
 
         User user = User.builder()
@@ -63,7 +63,7 @@ public class AuthService {
         );
 
         User user = userRepo.findByEmail(request.email())
-                .orElseThrow(() -> new ValidationRequestBodyException("User not found", "body.email"));
+                .orElseThrow(() -> new ValidationRequestBodyCustomException("User not found", "body.email"));
 
         AuthResponse authResponse = generateTokens(user);
 
@@ -81,7 +81,7 @@ public class AuthService {
     public void logout(String refreshToken) {
         String email = jwtService.extractEmail(new Token(refreshToken, TokenType.REFRESH_TOKEN));
         User user = userRepo.findByEmail(email)
-                .orElseThrow(() -> new ValidationRequestBodyException("User not found", "token.email"));
+                .orElseThrow(() -> new ValidationRequestBodyCustomException("User not found", "token.email"));
 
         String hashToken = HashingUtils.hashToken(refreshToken);
         userRepo.removeToken(user.getId(), hashToken);
@@ -91,7 +91,7 @@ public class AuthService {
     public AccessTokenResponse refresh(String refreshToken) {
         String email = jwtService.extractEmail(new Token(refreshToken, TokenType.REFRESH_TOKEN));
         User user = userRepo.findByEmail(email)
-                .orElseThrow(() -> new ValidationRequestBodyException("User not found", "token.email"));
+                .orElseThrow(() -> new ValidationRequestBodyCustomException("User not found", "token.email"));
 
         String token = jwtService.generateToken(user, TokenType.ACCESS_TOKEN);
         return new AccessTokenResponse(token);
