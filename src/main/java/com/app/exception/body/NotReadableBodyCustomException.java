@@ -22,11 +22,16 @@ public class NotReadableBodyCustomException extends BaseException {
         );
     }
 
+    private static String getFieldException(InvalidFormatException e) {
+        return e.getPath().get(e.getPath().size() - 1).getPropertyName();
+    }
+
     public static String extractReadableMessage(HttpMessageNotReadableException ex) {
         if (ex.getCause() instanceof InvalidFormatException ife && ife.getTargetType().isEnum()) {
-            return String.format("Invalid value '%s'. Accepted: %s",
-                    ife.getValue(), Arrays.toString(ife.getTargetType().getEnumConstants()));
+            return String.format("%s: Invalid value '%s'. Accepted: %s",
+                    getFieldException(ife), ife.getValue(), Arrays.toString(ife.getTargetType().getEnumConstants()));
         }
-        return ex.getMessage();
+        System.out.println(ex.getClass().getName() + ":" + ex.getMessage());
+        return "It was not possible to read the body of the request";
     }
 }

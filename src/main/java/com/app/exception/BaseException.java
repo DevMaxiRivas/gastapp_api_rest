@@ -1,9 +1,15 @@
 package com.app.exception;
 
-import lombok.Getter;
+import com.app.dto.v1.error.ErrorDetail;
+import com.app.dto.v1.error.ErrorResponse;
+import com.app.dto.v1.error.Links;
+import com.app.dto.v1.error.Source;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
-@Getter
+import java.util.List;
+
 public abstract class BaseException extends RuntimeException {
     private final String status;
     private final HttpStatus httpStatus;
@@ -16,5 +22,22 @@ public abstract class BaseException extends RuntimeException {
         this.httpStatus = httpStatus;
         this.title = title;
         this.pointer = pointer;
+    }
+
+    public ResponseEntity<ErrorResponse> buildErrorResponse(HttpServletRequest request) {
+
+        ErrorDetail errorDetail = ErrorDetail.builder()
+                .status(this.status)
+                .code(this.httpStatus.value())
+                .title(this.title)
+                .detail(this.getMessage())
+                .source(new Source(this.pointer))
+                .links(new Links(request.getRequestURL().toString()))
+                .build();
+
+        return new ResponseEntity<>(
+                ErrorResponse.builder().status("error").errors(List.of(errorDetail)).build(),
+                this.httpStatus
+        );
     }
 }
