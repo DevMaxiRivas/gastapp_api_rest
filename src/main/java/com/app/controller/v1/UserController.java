@@ -1,8 +1,10 @@
 package com.app.controller.v1;
 
 import com.app.dto.v1.ApiResponse;
+import com.app.dto.v1.user.QueryParamsUserFilterDTO;
 import com.app.dto.v1.user.UserResponseDTO;
 import com.app.service.user.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -23,12 +25,13 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<UserResponseDTO>>> getUsers(
+            @Valid QueryParamsUserFilterDTO filters,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.ASC) Pageable pageable) {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(
                         ApiResponse.paginatedSuccess(
-                                userService.getUsersPageable(pageable)
+                                userService.getFilteredUsersPageable(filters, pageable)
                         )
                 );
     }
