@@ -6,6 +6,7 @@ import com.app.dto.v1.user.UserResponseDTO;
 import com.app.service.user.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -26,7 +27,7 @@ public class UserController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<UserResponseDTO>>> getUsers(
             @Valid QueryParamsUserFilterDTO filters,
-            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.ASC) Pageable pageable) {
+            @ParameterObject @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.ASC) Pageable pageable) {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(

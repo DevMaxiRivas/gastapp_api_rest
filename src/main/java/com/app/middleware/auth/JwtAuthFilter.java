@@ -1,15 +1,20 @@
 package com.app.middleware.auth;
 
+import com.app.config.auth.AuthEntryPoint;
 import com.app.dto.v1.auth.Token;
 import com.app.enums.token.TokenType;
 import com.app.model.User;
 import com.app.repository.UserRepository;
 import com.app.service.auth.JwtService;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -40,6 +45,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserRepository userRepository;
+    private final AuthEntryPoint authEntryPoint;
 
     /**
      * Intercepts each request, extracts and validates the JWT, and registers
@@ -70,8 +76,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(
             HttpServletRequest request,
             HttpServletResponse response,
-            FilterChain chain) throws ServletException,
-            IOException
+            FilterChain chain
+    ) throws ServletException, IOException
     {
         // System.out.println(request.getRequestURL().toString());
         String authHeader = request.getHeader("Authorization");
@@ -85,23 +91,30 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 authHeader.substring(7),
                 TokenType.ACCESS_TOKEN
         );
-        String email = jwtService.extractEmail(token);
 
-        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            User user = userRepository.findByEmail(email).orElse(null);
+        try {
+            String email = jwtService.extractEmail(token);
 
-            if (user != null && jwtService.isTokenValid(token, user)) {
-                UsernamePasswordAuthenticationToken auth =
-                        new UsernamePasswordAuthenticationToken(
-                                user, null,
-                                user.getAuthorities()
-                        );
-                auth.setDetails(new WebAuthenticationDetailsSource()
-                        .buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(auth);
+            if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                User user = userRepository.findByEmail(email).orElse(null);
+
+                if (user != null && jwtService.isTokenValid(token, user)) {
+                    UsernamePasswordAuthenticationToken auth =
+                            new UsernamePasswordAuthenticationToken(
+                                    user, null,
+                                    user.getAuthorities()
+                            );
+                    auth.setDetails(new WebAuthenticationDetailsSource()
+                            .buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(auth);
+                }
             }
-        }
 
-        chain.doFilter(request, response);
+            chain.doFilter(request, response);
+        } catch (ExpiredJwtException | MalformedJwtException | SignatureException ex) {
+            SecurityContextHolder.clearContext();
+            authEntryPoint.commence(request, response,
+                    new AuthenticationServiceException(ex.getMessage(), ex));
+        }
     }
 }
