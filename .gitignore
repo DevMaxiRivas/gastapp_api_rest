@@ -34,6 +34,14 @@ build/
 
 ### Enviroment ###
 .env
+.env.dev
 
 # Ignore Shell Scripts
 *.sh
+
+# Testing
+Dockerfile
+compose.yaml
+nginx/
+
+.env.dev, Dockerfile, nginx/nginx.conf

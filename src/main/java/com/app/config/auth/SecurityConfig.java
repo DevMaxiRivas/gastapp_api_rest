@@ -47,6 +47,7 @@ public class SecurityConfig {
                         auth -> auth
                                 // Permit multiple specific paths
                                 .requestMatchers(
+                                        "/",
                                         "/api/v1/auth/**",
                                         "/api/v1/greet/**",
                                         "/swagger-ui/**",
