@@ -4,7 +4,7 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 @Getter
-public class GenericErrorException extends BaseException{
+public class GenericErrorException extends BaseException implements LoggeableException{
     protected Exception ex;
 
     public GenericErrorException(
@@ -20,7 +20,8 @@ public class GenericErrorException extends BaseException{
     }
 
     public void printLogs(){
-        System.out.println(this.ex.getClass().getName());
-        System.out.println(this.ex.getMessage());
+        if(this.ex != null){
+            System.out.println(this.ex.getMessage());
+        }
     }
 }
