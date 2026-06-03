@@ -2,10 +2,13 @@ package com.app.service.auth;
 
 import com.app.dto.v1.auth.*;
 import com.app.enums.token.TokenType;
+import com.app.exception.GenericErrorException;
+import com.app.exception.app.auth.jwt.InvalidJwtCustomException;
 import com.app.exception.body.ValidationRequestBodyCustomException;
 import com.app.model.User;
 import com.app.repository.UserRepository;
 import com.app.util.HashingUtils;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,6 +34,14 @@ public class AuthService {
         return new AuthResponse(new AccessTokenResponse(token), refreshToken);
     }
 
+    protected void removeRefreshToken(String email, String refreshToken) {
+        User user = userRepo.findByEmail(email)
+                .orElseThrow(InvalidJwtCustomException::new);
+
+        String hashToken = HashingUtils.hashToken(refreshToken);
+        userRepo.removeToken(user.getId(), hashToken);
+    }
+
     public AuthResponse register(RegisterRequest request) {
         if (userRepo.findByEmail(request.email()).isPresent()) {
             throw new ValidationRequestBodyCustomException("email: is already in use", "body.email" );
@@ -40,7 +51,6 @@ public class AuthService {
                 .name(request.name())
                 .email(request.email())
                 .password(passwordEncoder.encode(request.password()))
-                .currency(request.currency())
                 .tokens(List.of())
                 .build();
 
@@ -77,23 +87,39 @@ public class AuthService {
         return authResponse;
     }
 
-    @Transactional
+    @Transactional(dontRollbackOn = ExpiredJwtException.class)
     public void logout(String refreshToken) {
-        String email = jwtService.extractEmail(new Token(refreshToken, TokenType.REFRESH_TOKEN));
-        User user = userRepo.findByEmail(email)
-                .orElseThrow(() -> new ValidationRequestBodyCustomException("User not found", "token.email"));
-
-        String hashToken = HashingUtils.hashToken(refreshToken);
-        userRepo.removeToken(user.getId(), hashToken);
+        try {
+            String email = jwtService.extractEmail(new Token(refreshToken, TokenType.REFRESH_TOKEN));
+            removeRefreshToken(email, refreshToken);
+        } catch (Exception e) {
+            if (e instanceof ExpiredJwtException) {
+                String email = ((ExpiredJwtException) e).getClaims().getSubject();
+                removeRefreshToken(email, refreshToken);
+                throw e;
+            } else {
+                throw new GenericErrorException(e);
+            }
+        }
     }
 
-    @Transactional
+    @Transactional(dontRollbackOn = ExpiredJwtException.class)
     public AccessTokenResponse refresh(String refreshToken) {
-        String email = jwtService.extractEmail(new Token(refreshToken, TokenType.REFRESH_TOKEN));
-        User user = userRepo.findByEmail(email)
-                .orElseThrow(() -> new ValidationRequestBodyCustomException("User not found", "token.email"));
+        try {
+            String email = jwtService.extractEmail(new Token(refreshToken, TokenType.REFRESH_TOKEN));
+            User user = userRepo.findByEmail(email)
+                    .orElseThrow(() -> new ValidationRequestBodyCustomException("User not found", "token.email"));
 
-        String token = jwtService.generateToken(user, TokenType.ACCESS_TOKEN);
-        return new AccessTokenResponse(token);
+            String token = jwtService.generateToken(user, TokenType.ACCESS_TOKEN);
+            return new AccessTokenResponse(token);
+        } catch (Exception e) {
+            if (e instanceof ExpiredJwtException) {
+                String email = ((ExpiredJwtException) e).getClaims().getSubject();
+                removeRefreshToken(email, refreshToken);
+                throw e;
+            } else {
+                throw new GenericErrorException(e);
+            }
+        }
     }
 }
