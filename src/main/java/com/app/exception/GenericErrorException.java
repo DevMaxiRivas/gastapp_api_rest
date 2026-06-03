@@ -20,7 +20,9 @@ public class GenericErrorException extends BaseException implements LoggeableExc
     }
 
     public void printLogs(){
+        System.err.println("GenericErrorException");
         if(this.ex != null){
+            System.out.println(this.ex.getClass().getSimpleName());
             System.out.println(this.ex.getMessage());
         }
     }

@@ -4,6 +4,7 @@ import com.app.dto.v1.error.ErrorResponse;
 
 import com.app.exception.app.auth.BadCredentialsCustomException;
 import com.app.exception.app.auth.jwt.InvalidJwtCustomException;
+import com.app.exception.body.HttpMediaTypeNotSupportedCustomException;
 import com.app.exception.body.NotReadableBodyCustomException;
 import com.app.exception.cookie.MissingCookieCustomException;
 import com.app.exception.header.MissingHeaderCustomException;
@@ -18,6 +19,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestCookieException;
 import org.springframework.web.bind.MissingRequestHeaderException;
@@ -70,6 +72,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<ErrorResponse> handleNotResourceFound(NoResourceFoundException ex, HttpServletRequest request) {
         return (new ResourceNotFoundCustomException("Resource not found", "url")).buildErrorResponse(request);
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public ResponseEntity<ErrorResponse> handleHttpMediaTypeNotSupported(HttpMediaTypeNotSupportedException ex, HttpServletRequest request) {
+        return (new HttpMediaTypeNotSupportedCustomException(ex)).buildErrorResponse(request);
     }
 
     // Generic Error
