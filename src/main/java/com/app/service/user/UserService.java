@@ -11,7 +11,6 @@ import java.math.BigDecimal;
 public interface UserService {
     User findById(Long id);
     User findByEmail(String email);
-    User updateMonthlyBudget(Long userId, BigDecimal newBudget);
     Page<UserResponseDTO> getUsersPageable(Pageable pageable);
     Page<UserResponseDTO> getFilteredUsersPageable(QueryParamsUserFilterDTO filters, Pageable pageable);
 }

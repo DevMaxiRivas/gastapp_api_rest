@@ -44,4 +44,5 @@ Dockerfile
 compose.yaml
 nginx/
 
-.env.dev, Dockerfile, nginx/nginx.conf
+# Storage
+storage/

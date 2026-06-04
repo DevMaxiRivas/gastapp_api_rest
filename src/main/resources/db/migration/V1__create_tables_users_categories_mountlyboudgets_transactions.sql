@@ -3,11 +3,22 @@ CREATE TABLE users (
    name VARCHAR(100) NOT NULL,
    email VARCHAR(255) NOT NULL UNIQUE,
    password VARCHAR(255) NOT NULL,
-   currency VARCHAR(3) NOT NULL DEFAULT 1,
-   monthly_budget DECIMAL(12,2) DEFAULT NULL,
    tokens TEXT[]  DEFAULT '{}',
    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE profiles (
+  user_id BIGINT PRIMARY KEY,
+
+  currency VARCHAR(3) NOT NULL,
+  avatar_url TEXT DEFAULT NULL,
+  current_budget DECIMAL(12,2) DEFAULT NULL,
+
+  CONSTRAINT fk_profiles_user
+      FOREIGN KEY (user_id)
+          REFERENCES users(id)
+          ON DELETE CASCADE
 );
 
 

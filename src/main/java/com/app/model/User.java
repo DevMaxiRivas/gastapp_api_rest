@@ -35,15 +35,11 @@ public class User extends BaseEntity implements UserDetails {
     @Column(nullable = false)
     private String password;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private CurrencyType currency;
-
-    @Column(name = "monthly_budget", precision = 12, scale = 2)
-    private BigDecimal monthlyBudget;
-
     @Column(columnDefinition = "text[]")
     private List<String> tokens;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Profile profile;
 
     // --- UserDetails for Auth---
     @Override

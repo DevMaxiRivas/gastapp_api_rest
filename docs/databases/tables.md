@@ -8,17 +8,15 @@ For the MVP of the expense management application, these are the essential table
 
 Stores user account information and basic settings.
 
-| Column           | Data Type       | Constraints                          | Description                                                                    |
-|------------------|-----------------| ------------------------------------ |--------------------------------------------------------------------------------|
-| `id`             | `BIGSERIAL`     | `PRIMARY KEY`                        | Unique user identifier.                                                        |
-| `name`           | `VARCHAR(100)`  | `NOT NULL`                           | First name or nickname.                                                        |
-| `email`          | `VARCHAR(255)`  | `NOT NULL, UNIQUE`                   | Email used for login.                                                          |
-| `password`       | `VARCHAR(255)`  | `NOT NULL`                           | Password encrypted with BCrypt.                                                |
-| `currency`       | `VARCHAR(3)`    | `NOT NULL DEFAULT 'USD'`             | ISO 4217 currency code (e.g., ARS, USD, MXN).                                  |
-| `monthly_budget` | `DECIMAL(12,2)` | `DEFAULT NULL`                       | Total monthly expense budget. If NULL, it has not been defined.                |
-| `tokens`         | `TEXT[]`        | `DEFAULT NULL`                       | Array of token hashes.                                                         |
-| `created_at`     | `TIMESTAMP`     | `NOT NULL DEFAULT CURRENT_TIMESTAMP` | Account creation date.                                                         |
-| `updated_at`     | `TIMESTAMP`     | `NOT NULL DEFAULT CURRENT_TIMESTAMP` | Last profile update (should be updated through a trigger or application code). |
+| Column           | Data Type       | Constraints                          | Description                                                                 |
+|------------------|-----------------| ------------------------------------ |-----------------------------------------------------------------------------|
+| `id`             | `BIGSERIAL`     | `PRIMARY KEY`                        | Unique user identifier.                                                     |
+| `name`           | `VARCHAR(100)`  | `NOT NULL`                           | First name or nickname.                                                     |
+| `email`          | `VARCHAR(255)`  | `NOT NULL, UNIQUE`                   | Email used for login.                                                       |
+| `password`       | `VARCHAR(255)`  | `NOT NULL`                           | Password encrypted with BCrypt.                                             |
+| `tokens`         | `TEXT[]`        | `DEFAULT NULL`                       | Array of token hashes.                                                      |
+| `created_at`     | `TIMESTAMP`     | `NOT NULL DEFAULT CURRENT_TIMESTAMP` | Account creation date.                                                      |
+| `updated_at`     | `TIMESTAMP`     | `NOT NULL DEFAULT CURRENT_TIMESTAMP` | Last user update (should be updated through a trigger or application code). |
 
 ---
 
@@ -79,6 +77,20 @@ Stores budgets for past periods and also allows defining the current month’s b
 * **Suggested index**: `idx_monthly_budgets_user_month` on `(user_id, budget_month DESC)` → for monthly listings and dashboards.
 
 ---
+
+## 5. `profiles` Table
+
+Stores user profile information and personalized settings.
+
+| Column           | Data Type    | Constraints                                           | Description                                                    |
+| ---------------- | ------------ | ----------------------------------------------------- | -------------------------------------------------------------- |
+| `user_id`        | `BIGINT`     | `PRIMARY KEY, REFERENCES users(id) ON DELETE CASCADE` | Unique identifier of the user associated with the profile.     |
+| `currency`       | `VARCHAR(3)` | `NOT NULL`                                            | ISO 4217 currency code used by the user (e.g., USD, ARS, EUR). |
+| `avatar_url`     | `TEXT`       | `NULLABLE`                                            | URL of the user's profile picture.                             |
+| `current_budget` | `DECIMAL(12,2)`     | `DEFAULT NULL`                                        | Current active budget configured by the user.                  |
+
+---
+
 
 ## Additional Notes
 

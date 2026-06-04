@@ -34,14 +34,6 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new RuntimeException("Email no registrado"));
     }
 
-    @Override
-    @Transactional
-    public User updateMonthlyBudget(Long userId, BigDecimal newBudget) {
-        User user = findById(userId);
-        user.setMonthlyBudget(newBudget);
-        return repo.save(user);
-    }
-
     public Page<UserResponseDTO> getUsersPageable(Pageable pageable) {
         Page<User> entityPage = repo.findAll(pageable);
         return entityPage.map(mapper::toDto);

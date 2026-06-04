@@ -14,8 +14,5 @@ public record RegisterRequest(
 
         @NotNull()
         @Size(min = 8)
-        String password,
-
-        @NotNull()
-        CurrencyType currency
+        String password
 ) {}
