@@ -14,8 +14,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.nio.file.attribute.UserPrincipal;
-
 @RestController
 @RequestMapping("/api/v1/me/profile")
 @RequiredArgsConstructor
@@ -26,7 +24,7 @@ public class ProfileController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<ProfileResponseDTO>> createProfile(
             @Valid @RequestPart("data") ProfileCreateDTO dto,
-            @RequestPart("avatarImage") MultipartFile file,
+            @RequestPart(name="avatarImage", required = false) MultipartFile file,
             @AuthenticationPrincipal User user
     ) {
         return
@@ -42,7 +40,7 @@ public class ProfileController {
     @PatchMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<ProfileResponseDTO>> updateProfile(
             @Valid @RequestPart("data") ProfileUpdateDTO dto,
-            @RequestPart("avatarImage") MultipartFile file,
+            @RequestPart(name="avatarImage", required = false) MultipartFile file,
             @AuthenticationPrincipal User user
     ) {
         return

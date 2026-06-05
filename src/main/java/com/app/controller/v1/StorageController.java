@@ -1,48 +1,58 @@
 package com.app.controller.v1;
 
 import com.app.service.storage.FileStorageService;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.net.MalformedURLException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.IOException;
+import java.nio.file.Files;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@RequestMapping("/storage/public")
 @RestController
+@RequestMapping("/storage")
+@RequiredArgsConstructor
 public class StorageController {
-    private FileStorageService fileStorageService;
+    private final FileStorageService storageService;
 
-    @GetMapping("/avatars/{filename}")
-    public ResponseEntity<Resource> getAvatar(@PathVariable String filename) {
-        Path file = Paths.get("uploads/avatars").resolve(filename);
+    private ResponseEntity<Resource> serveFile(String disk, String folder, String fileName) {
+        Resource file = storageService.loadAsResource(disk, folder, fileName);
+
+        String contentType = null;
         try {
-        Resource resource = new UrlResource(file.toUri());
-        return ResponseEntity.ok()
-                .contentType(MediaType.IMAGE_JPEG)
-                .body(resource);
-        } catch (Exception e) {
-            if(e instanceof MalformedURLException) {
-                return ResponseEntity.notFound().build();
-            }
-
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+            contentType = Files.probeContentType(file.getFile().toPath());
+        } catch (IOException e) {
+            contentType = "application/octet-stream";
         }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + file.getFilename() + "\"")
+                .body(file);
+    }
+
+    @GetMapping("/public/{resource}/{folder}/{fileName:.+}")
+    public ResponseEntity<Resource> getPublicFile(
+            @PathVariable String resource,
+            @PathVariable String folder,
+            @PathVariable String fileName
+    ) {
+        String fullFolder = resource + "/" + folder;
+        return serveFile("public", fullFolder, fileName);
+    }
+
+    @GetMapping("/private/{folder}/{fileName:.+}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Resource> getPrivateFile(
+            @PathVariable String folder,
+            @PathVariable String fileName
+    ) {
+        return serveFile("private", folder, fileName);
     }
 }

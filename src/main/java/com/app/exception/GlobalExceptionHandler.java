@@ -13,6 +13,7 @@ import com.app.exception.app.auth.jwt.ExpiredJwtCustomException;
 
 import com.app.exception.resource.ResourceNotFoundCustomException;
 import com.app.exception.validation.MethodArgumentNotValidCustomException;
+import com.app.exception.validation.MissingServletRequestPartCustomException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.MissingRequestCookieException;
 import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
@@ -79,6 +81,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
     public ResponseEntity<ErrorResponse> handleHttpMediaTypeNotSupported(HttpMediaTypeNotSupportedException ex, HttpServletRequest request) {
         return (new HttpMediaTypeNotSupportedCustomException(ex)).buildErrorResponse(request);
+    }
+
+    @ExceptionHandler(MissingServletRequestPartException.class)
+    public ResponseEntity<ErrorResponse> handleMissingServletRequest(MissingServletRequestPartException ex, HttpServletRequest request) {
+        return (new MissingServletRequestPartCustomException(ex)).buildErrorResponse(request);
     }
 
     @ExceptionHandler(AuthorizationDeniedException.class)
