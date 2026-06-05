@@ -45,4 +45,4 @@ compose.yaml
 nginx/
 
 # Storage
-storage/
+/storage/
