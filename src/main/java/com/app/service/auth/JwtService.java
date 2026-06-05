@@ -2,6 +2,7 @@ package com.app.service.auth;
 
 import com.app.dto.v1.auth.Token;
 import com.app.enums.token.TokenType;
+import com.app.model.Permission;
 import com.app.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -13,7 +14,10 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class JwtService {
@@ -44,10 +48,17 @@ public class JwtService {
     }
 
     public String generateToken(User user, TokenType tokenType) {
+        String role = user.getRole().getName();
+        Set<String> permissions = user.getRole().getPermissions().stream()
+                .map(Permission::getName)
+                .collect(Collectors.toSet());
+
         return Jwts.builder()
                 .subject(user.getEmail())
                 .claim("id", user.getId())
                 .claim("name", user.getName())
+                .claim("role", role)
+                .claim("permissions", permissions)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + getDurationToken(tokenType)))
                 .signWith(getSigningKey(tokenType))

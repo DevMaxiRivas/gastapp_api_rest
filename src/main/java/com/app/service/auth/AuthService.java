@@ -5,7 +5,9 @@ import com.app.enums.token.TokenType;
 import com.app.exception.GenericErrorException;
 import com.app.exception.app.auth.jwt.InvalidJwtCustomException;
 import com.app.exception.body.ValidationRequestBodyCustomException;
+import com.app.model.Role;
 import com.app.model.User;
+import com.app.repository.RoleRepository;
 import com.app.repository.UserRepository;
 import com.app.util.HashingUtils;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +30,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authManager;
+    private final RoleRepository roleRepo;
 
     protected AuthResponse generateTokens(User user) {
         String token = jwtService.generateToken(user, TokenType.ACCESS_TOKEN);
@@ -47,12 +51,17 @@ public class AuthService {
             throw new ValidationRequestBodyCustomException("email: is already in use", "body.email" );
         }
 
+        Role defaultRole = roleRepo.findByName("USER").orElseThrow(() -> new RuntimeException("Default role not found"));
+
         User user = User.builder()
                 .name(request.name())
                 .email(request.email())
                 .password(passwordEncoder.encode(request.password()))
+                .role(defaultRole)
                 .tokens(List.of())
                 .build();
+
+        userRepo.save(user);
 
         AuthResponse authResponse = generateTokens(user);
         user.setTokens(List.of(

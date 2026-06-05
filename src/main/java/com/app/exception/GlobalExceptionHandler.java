@@ -2,6 +2,7 @@ package com.app.exception;
 
 import com.app.dto.v1.error.ErrorResponse;
 
+import com.app.exception.app.auth.AuthorizationDeniedCustomException;
 import com.app.exception.app.auth.BadCredentialsCustomException;
 import com.app.exception.app.auth.jwt.InvalidJwtCustomException;
 import com.app.exception.body.HttpMediaTypeNotSupportedCustomException;
@@ -19,6 +20,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestCookieException;
@@ -77,6 +79,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
     public ResponseEntity<ErrorResponse> handleHttpMediaTypeNotSupported(HttpMediaTypeNotSupportedException ex, HttpServletRequest request) {
         return (new HttpMediaTypeNotSupportedCustomException(ex)).buildErrorResponse(request);
+    }
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAuthorizationDenied(AuthorizationDeniedException ex, HttpServletRequest request) {
+        AuthorizationDeniedCustomException exception =  new AuthorizationDeniedCustomException(ex);
+        exception.printLogs();
+        return exception.buildErrorResponse(request);
     }
 
     // Generic Error
