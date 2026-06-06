@@ -47,12 +47,14 @@ public class StorageController {
         return serveFile("public", fullFolder, fileName);
     }
 
-    @GetMapping("/private/{folder}/{fileName:.+}")
+    @GetMapping("/private/{resource}/{folder}/{fileName:.+}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Resource> getPrivateFile(
+            @PathVariable String resource,
             @PathVariable String folder,
             @PathVariable String fileName
     ) {
-        return serveFile("private", folder, fileName);
+        String fullFolder = resource + "/" + folder;
+        return serveFile("private", fullFolder, fileName);
     }
 }
