@@ -35,6 +35,7 @@ build/
 ### Enviroment ###
 .env
 .env.dev
+.env.prod
 
 # Ignore Shell Scripts
 *.sh
