@@ -36,7 +36,7 @@ public abstract class BaseException extends RuntimeException {
                 .build();
 
         return new ResponseEntity<>(
-                ErrorResponse.builder().status("error").errors(List.of(errorDetail)).build(),
+                ErrorResponse.builder().errors(List.of(errorDetail)).build(),
                 this.httpStatus
         );
     }

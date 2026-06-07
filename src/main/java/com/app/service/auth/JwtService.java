@@ -13,9 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -47,7 +45,10 @@ public class JwtService {
         return  refreshExpiration;
     }
 
-    public String generateToken(User user, TokenType tokenType) {
+
+    public String generateToken(User user,
+                                Map<String, Object> data,
+                                TokenType tokenType) {
         String role = user.getRole().getName();
         Set<String> permissions = user.getRole().getPermissions().stream()
                 .map(Permission::getName)
@@ -55,10 +56,11 @@ public class JwtService {
 
         return Jwts.builder()
                 .subject(user.getEmail())
-                .claim("id", user.getId())
-                .claim("name", user.getName())
-                .claim("role", role)
-                .claim("permissions", permissions)
+                .claims(data)
+//                .claim("id", user.getId())
+//                .claim("name", user.getName())
+//                .claim("role", role)
+//                .claim("permissions", permissions)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + getDurationToken(tokenType)))
                 .signWith(getSigningKey(tokenType))

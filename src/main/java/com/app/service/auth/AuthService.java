@@ -1,15 +1,18 @@
 package com.app.service.auth;
 
 import com.app.dto.v1.auth.*;
+import com.app.dto.v1.auth.claim.TokenClaimDTO;
 import com.app.enums.token.TokenType;
 import com.app.exception.GenericErrorException;
 import com.app.exception.app.auth.jwt.InvalidJwtCustomException;
 import com.app.exception.body.ValidationRequestBodyCustomException;
+import com.app.mapper.auth.AuthMapper;
 import com.app.model.Role;
 import com.app.model.User;
 import com.app.repository.RoleRepository;
 import com.app.repository.UserRepository;
 import com.app.util.HashingUtils;
+import com.app.util.MapUtils;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -20,22 +23,27 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
     private final UserRepository userRepo;
+    private final RoleRepository roleRepo;
+
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authManager;
-    private final RoleRepository roleRepo;
+
+    private final AuthMapper  authMapper;
 
     protected AuthResponse generateTokens(User user) {
-        String token = jwtService.generateToken(user, TokenType.ACCESS_TOKEN);
-        String refreshToken = jwtService.generateToken(user, TokenType.REFRESH_TOKEN);
-        return new AuthResponse(new AccessTokenResponse(token), refreshToken);
+        TokenClaimDTO data = authMapper.toDto(user);
+            Map<String, Object> map = MapUtils.convertToMap(data);
+            String token = jwtService.generateToken(user, map, TokenType.ACCESS_TOKEN);
+            String refreshToken = jwtService.generateToken(user, map, TokenType.REFRESH_TOKEN);
+            return new AuthResponse(new AccessTokenResponse(token), refreshToken);
     }
 
     protected void removeRefreshToken(String email, String refreshToken) {
@@ -119,7 +127,9 @@ public class AuthService {
             User user = userRepo.findByEmail(email)
                     .orElseThrow(() -> new ValidationRequestBodyCustomException("User not found", "token.email"));
 
-            String token = jwtService.generateToken(user, TokenType.ACCESS_TOKEN);
+            TokenClaimDTO data = authMapper.toDto(user);
+            Map<String, Object> map = MapUtils.convertToMap(data);
+            String token = jwtService.generateToken(user, map, TokenType.ACCESS_TOKEN);
             return new AccessTokenResponse(token);
         } catch (Exception e) {
             if (e instanceof ExpiredJwtException) {

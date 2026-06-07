@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -27,7 +28,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
-import java.util.Objects;
+import java.util.List;
 
 /**
  * Security configuration for the application.
@@ -46,17 +47,12 @@ public class SecurityConfig {
     private final UserRepository userRepository;
     private final AuthEntryPoint authEntryPoint;
 
-    @Value("${frontend.application.url}")
-    private String frontendUrl;
-
-    @Value("${spring.application.environment}")
-    private String environment;
-
     @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
+    @Profile("dev")
+    public CorsConfigurationSource corsConfigurationSource(@Value("${frontend.application.url}") String frontendUrl) {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Use specific origins instead of "*" for better security, especially with credentials
-        configuration.setAllowedOrigins(Arrays.asList(frontendUrl));
+        List<String> origins = List.of(frontendUrl);
+        configuration.setAllowedOrigins(origins);
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
         configuration.setAllowCredentials(true);
@@ -68,8 +64,9 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
+        return http
                 .csrf(AbstractHttpConfigurer::disable)
+                .cors(Customizer.withDefaults())
                 .sessionManagement(s -> s
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(ex -> ex
@@ -86,7 +83,6 @@ public class SecurityConfig {
                                         "/swagger-ui.html",
                                         "/v1/api-docs/**",
                                         "/storage/public/**"
-//                                        ,"/api/v1/users/**"
                                 )
                                 .permitAll()
 
@@ -94,13 +90,7 @@ public class SecurityConfig {
                                 .anyRequest()
                                 .authenticated()
                 )
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-
-        if(Objects.equals(environment, "dev"))
-            http.cors(Customizer.withDefaults());
-
-        return
-                http
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 

@@ -10,7 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class ErrorResponse {
-    private String status;
+    private final boolean success = false;
     private List<ErrorDetail> errors;
 }
 

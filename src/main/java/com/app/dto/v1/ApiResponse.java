@@ -15,10 +15,10 @@ public class ApiResponse<T> {
     private T data;
     private PaginationMeta meta;
     private int statusCode;
-    private boolean success;
+    private final boolean success = true;
 
     public static <T> ApiResponse<T> success(T data) {
-        return new ApiResponse<>(data,null, HttpStatus.OK.value(), true);
+        return new ApiResponse<>(data,null, HttpStatus.OK.value());
     }
 
     public static <T> ApiResponse<List<T>> paginatedSuccess(Page<T> page) {
@@ -30,15 +30,15 @@ public class ApiResponse<T> {
                 page.isFirst(),
                 page.isLast()
         );
-        return new ApiResponse<>(page.getContent(), meta, HttpStatus.OK.value(), true);
+        return new ApiResponse<>(page.getContent(), meta, HttpStatus.OK.value());
     }
 
 
     public static <T> ApiResponse<T> created(T data) {
-        return new ApiResponse<>(data, null, HttpStatus.CREATED.value(), true);
+        return new ApiResponse<>(data, null, HttpStatus.CREATED.value());
     }
 
     public static <T> ApiResponse<T> noContent(int statusCode) {
-        return new ApiResponse<>(null, null, HttpStatus.NO_CONTENT.value(), true);
+        return new ApiResponse<>(null, null, HttpStatus.NO_CONTENT.value());
     }
 }

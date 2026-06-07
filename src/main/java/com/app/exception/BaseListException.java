@@ -17,7 +17,6 @@ public abstract class BaseListException extends Exception {
 
     public ResponseEntity<ErrorResponse> buildErrorResponse() {
         ErrorResponse response = ErrorResponse.builder()
-                .status("error")
                 .errors(getListErrorDetail())
                 .build();
 
