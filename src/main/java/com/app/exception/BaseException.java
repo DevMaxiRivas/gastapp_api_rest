@@ -32,7 +32,7 @@ public abstract class BaseException extends RuntimeException {
                 .title(this.title)
                 .detail(this.getMessage())
                 .source(new Source(this.pointer))
-                .links(new Links(request.getRequestURL().toString()))
+                .links(new Links(request.getRequestURI()))
                 .build();
 
         return new ResponseEntity<>(

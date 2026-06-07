@@ -11,6 +11,7 @@ import com.app.exception.cookie.MissingCookieCustomException;
 import com.app.exception.header.MissingHeaderCustomException;
 import com.app.exception.app.auth.jwt.ExpiredJwtCustomException;
 
+import com.app.exception.method.HttpRequestMethodNotSupportedCustomException;
 import com.app.exception.resource.ResourceNotFoundCustomException;
 import com.app.exception.validation.MethodArgumentNotValidCustomException;
 import com.app.exception.validation.MissingServletRequestPartCustomException;
@@ -23,6 +24,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestCookieException;
 import org.springframework.web.bind.MissingRequestHeaderException;
@@ -93,6 +95,11 @@ public class GlobalExceptionHandler {
         AuthorizationDeniedCustomException exception =  new AuthorizationDeniedCustomException(ex);
         exception.printLogs();
         return exception.buildErrorResponse(request);
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ErrorResponse> handleHttpMethodNotSupported(HttpRequestMethodNotSupportedException ex, HttpServletRequest request) {
+        return (new HttpRequestMethodNotSupportedCustomException(ex)).buildErrorResponse(request);
     }
 
     // Generic Error
