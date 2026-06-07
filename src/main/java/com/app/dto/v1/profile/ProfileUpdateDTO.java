@@ -10,5 +10,4 @@ import java.math.BigDecimal;
 public class ProfileUpdateDTO {
     private CurrencyType currency;
     private BigDecimal currentBudget;
-    private MultipartFile avatarProfile;
 }

@@ -6,6 +6,11 @@ import com.app.dto.v1.profile.ProfileResponseDTO;
 import com.app.dto.v1.profile.ProfileUpdateDTO;
 import com.app.model.User;
 import com.app.service.profile.ProfileService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Encoding;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -21,6 +26,16 @@ public class ProfileController {
 
     private final ProfileService profileService;
 
+    @Operation(summary = "Create profile")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            content = @Content(
+                    mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
+                    encoding = {
+                            @Encoding(name = "avatarImage", contentType = "image/jpeg, image/png, image/webp"),
+                            @Encoding(name = "data",        contentType = "application/json")
+                    }
+            )
+    )
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<ProfileResponseDTO>> createProfile(
             @Valid @RequestPart("data") ProfileCreateDTO dto,
@@ -37,6 +52,16 @@ public class ProfileController {
     }
 
 
+    @Operation(summary = "Update profile")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            content = @Content(
+                    mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
+                    encoding = {
+                            @Encoding(name = "avatarImage", contentType = "image/jpeg, image/png, image/webp"),
+                            @Encoding(name = "data",        contentType = "application/json")
+                    }
+            )
+    )
     @PatchMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<ProfileResponseDTO>> updateProfile(
             @Valid @RequestPart("data") ProfileUpdateDTO dto,
