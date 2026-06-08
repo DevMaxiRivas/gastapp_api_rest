@@ -88,6 +88,7 @@ CREATE TABLE categories (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
     icon VARCHAR(40) NOT NULL,
+    type VARCHAR(7) NOT NULL,
 
     user_id BIGINT NULL,
 

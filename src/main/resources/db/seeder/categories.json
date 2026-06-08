@@ -1,34 +1,42 @@
 [
   {
     "name" : "Alimentation",
-    "icon" : "UTENSILSICON"
+    "icon" : "UTENSILSICON",
+    "type" : "EXPENSE"
   },
   {
     "name" : "Transport",
-    "icon" : "CARICO"
+    "icon" : "CARICO",
+    "type" : "EXPENSE"
   },
   {
     "name" : "Services",
-    "icon" : "HOMEICO"
+    "icon" : "HOMEICO",
+    "type" : "EXPENSE"
   },
   {
     "name" :"Leisure",
-    "icon" :"TVICO"
+    "icon" :"TVICO",
+    "type" : "EXPENSE"
   },
   {
     "name" :"Home",
-    "icon" :"HOMEICO"
+    "icon" :"HOMEICO",
+    "type" : "EXPENSE"
   },
   {
     "name" :"Health",
-    "icon" :"HEARTICO"
+    "icon" :"HEARTICO",
+    "type" : "EXPENSE"
   },
   {
     "name" :"Shopping",
-    "icon" :"SHOPPINGBAGICO"
+    "icon" :"SHOPPINGBAGICO",
+    "type" : "EXPENSE"
   },
   {
     "name" :"Another",
-    "icon" :"MOREHORIZONTALICON"
+    "icon" :"MOREHORIZONTALICON",
+    "type" : "EXPENSE"
   }
 ]
