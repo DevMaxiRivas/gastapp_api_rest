@@ -1,0 +1,34 @@
+[
+  {
+    "name" : "Alimentation",
+    "icon" : "UTENSILSICON"
+  },
+  {
+    "name" : "Transport",
+    "icon" : "CARICO"
+  },
+  {
+    "name" : "Services",
+    "icon" : "HOMEICO"
+  },
+  {
+    "name" :"Leisure",
+    "icon" :"TVICO"
+  },
+  {
+    "name" :"Home",
+    "icon" :"HOMEICO"
+  },
+  {
+    "name" :"Health",
+    "icon" :"HEARTICO"
+  },
+  {
+    "name" :"Shopping",
+    "icon" :"SHOPPINGBAGICO"
+  },
+  {
+    "name" :"Another",
+    "icon" :"MOREHORIZONTALICON"
+  }
+]
