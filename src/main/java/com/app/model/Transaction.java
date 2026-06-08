@@ -1,10 +1,9 @@
 package com.app.model;
-import com.app.enums.transaction.TransactionType;
+import com.app.enums.transaction.TransactionTypeEnum;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -32,7 +31,7 @@ public class Transaction extends SoftDeleteEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private TransactionType type;
+    private TransactionTypeEnum type;
 
     @Column(name = "transaction_date", nullable = false)
     private LocalDate transactionDate;

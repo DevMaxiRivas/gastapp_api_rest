@@ -1,21 +1,21 @@
 package com.app.dto.v1.transaction;
 
-import com.app.enums.transaction.TransactionType;
+import com.app.enums.transaction.TransactionTypeEnum;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public record TransactionRequestDTO(
+public record TransactionCreateDTO(
         @NotNull
         @Min(0)
         BigDecimal amount,
 
-        TransactionType type,
+        TransactionTypeEnum type,
 
         @NotNull
-        LocalDate date,
+        LocalDate transactionDate,
 
         String note,
 

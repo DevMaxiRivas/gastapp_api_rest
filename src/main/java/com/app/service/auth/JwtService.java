@@ -1,7 +1,7 @@
 package com.app.service.auth;
 
 import com.app.dto.v1.auth.Token;
-import com.app.enums.token.TokenType;
+import com.app.enums.token.TokenTypeEnum;
 import com.app.model.Permission;
 import com.app.model.User;
 import io.jsonwebtoken.Claims;
@@ -32,23 +32,23 @@ public class JwtService {
     @Value("${spring.application.jwt_refresh_secret_expiration}")
     private long refreshExpiration;
 
-    private SecretKey getSigningKey(TokenType tokenType) {
-        if (tokenType == TokenType.ACCESS_TOKEN) {
+    private SecretKey getSigningKey(TokenTypeEnum tokenType) {
+        if (tokenType == TokenTypeEnum.ACCESS_TOKEN) {
             return Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
         }
 
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(refreshSecretKey));
     }
 
-    private long getDurationToken(TokenType tokenType){
-        if (tokenType == TokenType.ACCESS_TOKEN) return expiration;
+    private long getDurationToken(TokenTypeEnum tokenType){
+        if (tokenType == TokenTypeEnum.ACCESS_TOKEN) return expiration;
         return  refreshExpiration;
     }
 
 
     public String generateToken(User user,
                                 Map<String, Object> data,
-                                TokenType tokenType) {
+                                TokenTypeEnum tokenType) {
         String role = user.getRole().getName();
         Set<String> permissions = user.getRole().getPermissions().stream()
                 .map(Permission::getName)
@@ -57,10 +57,6 @@ public class JwtService {
         return Jwts.builder()
                 .subject(user.getEmail())
                 .claims(data)
-//                .claim("id", user.getId())
-//                .claim("name", user.getName())
-//                .claim("role", role)
-//                .claim("permissions", permissions)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + getDurationToken(tokenType)))
                 .signWith(getSigningKey(tokenType))

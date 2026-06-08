@@ -1,6 +1,6 @@
 package com.app.enums.category;
 
-public enum IconEnum {
+public enum CategoryIconEnum {
     UTENSILSICON,
     CARICO,
     CREDITCARDICO,

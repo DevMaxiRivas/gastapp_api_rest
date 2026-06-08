@@ -1,6 +1,6 @@
 package com.app.enums.token;
 
-public enum TokenType {
+public enum TokenTypeEnum {
     ACCESS_TOKEN,
     REFRESH_TOKEN
 }

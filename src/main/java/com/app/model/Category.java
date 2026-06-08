@@ -1,6 +1,6 @@
 package com.app.model;
 
-import com.app.enums.category.IconEnum;
+import com.app.enums.category.CategoryIconEnum;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -24,7 +24,7 @@ public class Category {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 40)
-    private IconEnum icon;
+    private CategoryIconEnum icon;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

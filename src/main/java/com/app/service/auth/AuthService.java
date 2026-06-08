@@ -2,7 +2,7 @@ package com.app.service.auth;
 
 import com.app.dto.v1.auth.*;
 import com.app.dto.v1.auth.claim.TokenClaimDTO;
-import com.app.enums.token.TokenType;
+import com.app.enums.token.TokenTypeEnum;
 import com.app.exception.GenericErrorException;
 import com.app.exception.app.auth.jwt.InvalidJwtCustomException;
 import com.app.exception.body.ValidationRequestBodyCustomException;
@@ -41,8 +41,8 @@ public class AuthService {
     protected AuthResponse generateTokens(User user) {
         TokenClaimDTO data = authMapper.toDto(user);
             Map<String, Object> map = MapUtils.convertToMap(data);
-            String token = jwtService.generateToken(user, map, TokenType.ACCESS_TOKEN);
-            String refreshToken = jwtService.generateToken(user, map, TokenType.REFRESH_TOKEN);
+            String token = jwtService.generateToken(user, map, TokenTypeEnum.ACCESS_TOKEN);
+            String refreshToken = jwtService.generateToken(user, map, TokenTypeEnum.REFRESH_TOKEN);
             return new AuthResponse(new AccessTokenResponse(token), refreshToken);
     }
 
@@ -107,7 +107,7 @@ public class AuthService {
     @Transactional(dontRollbackOn = ExpiredJwtException.class)
     public void logout(String refreshToken) {
         try {
-            String email = jwtService.extractEmail(new Token(refreshToken, TokenType.REFRESH_TOKEN));
+            String email = jwtService.extractEmail(new Token(refreshToken, TokenTypeEnum.REFRESH_TOKEN));
             removeRefreshToken(email, refreshToken);
         } catch (Exception e) {
             if (e instanceof ExpiredJwtException) {
@@ -123,13 +123,13 @@ public class AuthService {
     @Transactional(dontRollbackOn = ExpiredJwtException.class)
     public AccessTokenResponse refresh(String refreshToken) {
         try {
-            String email = jwtService.extractEmail(new Token(refreshToken, TokenType.REFRESH_TOKEN));
+            String email = jwtService.extractEmail(new Token(refreshToken, TokenTypeEnum.REFRESH_TOKEN));
             User user = userRepo.findByEmail(email)
                     .orElseThrow(() -> new ValidationRequestBodyCustomException("User not found", "token.email"));
 
             TokenClaimDTO data = authMapper.toDto(user);
             Map<String, Object> map = MapUtils.convertToMap(data);
-            String token = jwtService.generateToken(user, map, TokenType.ACCESS_TOKEN);
+            String token = jwtService.generateToken(user, map, TokenTypeEnum.ACCESS_TOKEN);
             return new AccessTokenResponse(token);
         } catch (Exception e) {
             if (e instanceof ExpiredJwtException) {

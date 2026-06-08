@@ -1,6 +1,6 @@
 package com.app.mapper.transaction;
 
-import com.app.dto.v1.transaction.TransactionRequestDTO;
+import com.app.dto.v1.transaction.TransactionCreateDTO;
 import com.app.dto.v1.transaction.TransactionResponseDTO;
 import com.app.mapper.category.CategoryMapper;
 import com.app.model.Transaction;
@@ -16,7 +16,7 @@ public interface TransactionMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "user", ignore = true)
     @Mapping(target = "category", ignore = true)
-    Transaction toEntity(TransactionRequestDTO dto);
+    Transaction toEntity(TransactionCreateDTO dto);
 
     List<TransactionResponseDTO> toDtoList(List<Transaction> transactions);
 }

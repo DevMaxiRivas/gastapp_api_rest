@@ -2,7 +2,7 @@ package com.app.middleware.auth;
 
 import com.app.config.auth.AuthEntryPoint;
 import com.app.dto.v1.auth.Token;
-import com.app.enums.token.TokenType;
+import com.app.enums.token.TokenTypeEnum;
 import com.app.model.User;
 import com.app.repository.UserRepository;
 import com.app.service.auth.JwtService;
@@ -89,7 +89,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         Token token = new Token(
                 authHeader.substring(7),
-                TokenType.ACCESS_TOKEN
+                TokenTypeEnum.ACCESS_TOKEN
         );
 
         try {

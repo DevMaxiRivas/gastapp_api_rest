@@ -87,7 +87,7 @@ CREATE INDEX idx_monthly_budgets_user_month
 CREATE TABLE categories (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
-    icon VARCHAR(10) NOT NULL DEFAULT '❓',
+    icon VARCHAR(40) NOT NULL,
 
     user_id BIGINT NULL,
 

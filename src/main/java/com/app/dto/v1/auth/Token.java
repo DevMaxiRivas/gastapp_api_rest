@@ -1,6 +1,6 @@
 package com.app.dto.v1.auth;
 
-import com.app.enums.token.TokenType;
+import com.app.enums.token.TokenTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -8,5 +8,5 @@ import lombok.Getter;
 @AllArgsConstructor
 public class Token {
     private String value;
-    private TokenType tokenType;
+    private TokenTypeEnum tokenType;
 }

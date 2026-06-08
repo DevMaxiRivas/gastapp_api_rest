@@ -1,4 +1,4 @@
-package com.app.db.seeder;
+package com.app.db.seeder.role;
 
 import com.app.enums.permissions.PermissionEnum;
 import com.app.enums.permissions.ResourceEnum;
@@ -12,12 +12,12 @@ import org.springframework.stereotype.Component;
 import java.util.Set;
 
 @Component
-public class DataInitializer {
+public class RolesInitializer {
 
     private final RoleRepository roleRepository;
     private final PermissionRepository permissionRepository;
 
-    public DataInitializer(
+    public RolesInitializer(
             RoleRepository roleRepository,
             PermissionRepository permissionRepository
     ) {

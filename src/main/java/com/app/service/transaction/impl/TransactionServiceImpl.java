@@ -1,5 +1,11 @@
 package com.app.service.transaction.impl;
 
+import com.app.dto.v1.ApiResponse;
+import com.app.dto.v1.transaction.TransactionCreateDTO;
+import com.app.dto.v1.transaction.TransactionResponseDTO;
+import com.app.exception.body.ValidationRequestBodyCustomException;
+import com.app.exception.resource.ResourceNotFoundCustomException;
+import com.app.mapper.transaction.TransactionMapper;
 import com.app.model.Category;
 import com.app.model.Transaction;
 import com.app.model.User;
@@ -18,24 +24,25 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
     private final TransactionRepository transactionRepository;
-    private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+
+    private final TransactionMapper mapper;
 
     @Override
     @Transactional
-    public Transaction create(Transaction transaction, Long userId, Long categoryId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Usuario no existe"));
-
-        Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new RuntimeException("Categoría no existe"));
+    public TransactionResponseDTO create(TransactionCreateDTO dto, User user) {
+        Category category = categoryRepository.findById(dto.categoryId())
+                .orElseThrow(() -> new ValidationRequestBodyCustomException("Category not found", "body.categoryId"));
+        Transaction transaction = new Transaction();
 
         transaction.setUser(user);
         transaction.setCategory(category);
-
-        // Business Logic Here. Example: Send Notification
-
-        return transactionRepository.save(transaction);
+        transaction.setAmount(dto.amount());
+        transaction.setNote(dto.note());
+        transaction.setTransactionDate(dto.transactionDate());
+        transaction.setType(dto.type());
+        transactionRepository.save(transaction);
+        return mapper.toDto(transaction);
     }
 
     @Override
@@ -50,7 +57,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Transactional
     public void delete(Long id) {
         if (!transactionRepository.existsById(id)) {
-            throw new RuntimeException("La transacción no existe");
+            throw new ResourceNotFoundCustomException("Transaction not found", "url");
         }
         transactionRepository.deleteById(id);
     }

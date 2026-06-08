@@ -1,6 +1,6 @@
 package com.app.enums.transaction;
 
-public enum TransactionType {
+public enum TransactionTypeEnum {
     INCOME,
     EXPENSE
 }

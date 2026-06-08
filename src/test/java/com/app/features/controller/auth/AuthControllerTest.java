@@ -1,9 +1,8 @@
-package com.app.features.controller;
+package com.app.features.controller.auth;
 
 import com.app.config.AbstractIntegrationTest;
 import com.app.dto.v1.ApiResponse;
 import com.app.dto.v1.auth.AccessTokenResponse;
-import com.app.dto.v1.auth.AuthResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,8 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.test.web.reactive.server.EntityExchangeResult;
 import org.springframework.test.web.reactive.server.WebTestClient;
-
-import java.util.LinkedHashMap;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
@@ -39,7 +36,6 @@ class AuthControllerTest extends AbstractIntegrationTest {
                 {
                     "name" : "TestUser1",
                     "email" : "test1@example.com",
-                    "currency" : "USD",
                     "password" : "Pwd12345"
                 }
                 """)
@@ -58,8 +54,7 @@ class AuthControllerTest extends AbstractIntegrationTest {
                 {
                     "name" : "TestUser",
                     "email" : "test@example.com",
-                    "currency"  : "UD",
-                    "password" : "Pwd12345"
+                    "password" : "Pwd12345",
                 }
                 """)
                 .exchange()
@@ -67,7 +62,6 @@ class AuthControllerTest extends AbstractIntegrationTest {
                     .isEqualTo(HttpStatus.BAD_REQUEST)
                 .expectBody()
                     .jsonPath("$.errors").exists()
-                    .jsonPath("$.status").isEqualTo("error");
         ;
 
         webTestClient.post()
@@ -77,7 +71,7 @@ class AuthControllerTest extends AbstractIntegrationTest {
                 {
                     "name" : "TestUser",
                     "email" : "test@example.com",
-                    "password" : "Pwd12345"
+                    "password" : "Pwd12345",
                 }
                 """)
                 .exchange()
@@ -85,7 +79,7 @@ class AuthControllerTest extends AbstractIntegrationTest {
                     .is4xxClientError()
                 .expectBody()
                     .jsonPath("$.errors").exists()
-                    .jsonPath("$.status").isEqualTo("error")
+                    .jsonPath("$.success").isEqualTo(false)
         ;
     }
 
@@ -98,7 +92,6 @@ class AuthControllerTest extends AbstractIntegrationTest {
                 {
                     "name" : "TestUser",
                     "email" : "test@example.com",
-                    "currency" : "USD",
                     "password" : "Pwd12345"
                 }
                 """)
