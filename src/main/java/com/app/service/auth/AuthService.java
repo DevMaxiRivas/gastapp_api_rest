@@ -113,10 +113,8 @@ public class AuthService {
             if (e instanceof ExpiredJwtException) {
                 String email = ((ExpiredJwtException) e).getClaims().getSubject();
                 removeRefreshToken(email, refreshToken);
-                throw e;
-            } else {
-                throw new GenericErrorException(e);
             }
+            throw e;
         }
     }
 
@@ -135,10 +133,8 @@ public class AuthService {
             if (e instanceof ExpiredJwtException) {
                 String email = ((ExpiredJwtException) e).getClaims().getSubject();
                 removeRefreshToken(email, refreshToken);
-                throw e;
-            } else {
-                throw new GenericErrorException(e);
             }
+            throw e;
         }
     }
 }
