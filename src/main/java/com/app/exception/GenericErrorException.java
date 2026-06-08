@@ -17,6 +17,7 @@ public class GenericErrorException extends BaseException implements LoggeableExc
                 "Server error",
                 "unknown"
         );
+        this.ex = ex;
     }
 
     public void printLogs(){
