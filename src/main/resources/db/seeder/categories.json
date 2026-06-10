@@ -10,33 +10,58 @@
     "type" : "EXPENSE"
   },
   {
-    "name" : "Services",
+    "name" : "services",
     "icon" : "HOMEICO",
     "type" : "EXPENSE"
   },
   {
-    "name" :"Leisure",
+    "name" :"leisure",
     "icon" :"TVICO",
     "type" : "EXPENSE"
   },
   {
-    "name" :"Home",
+    "name" :"home",
     "icon" :"HOMEICO",
     "type" : "EXPENSE"
   },
   {
-    "name" :"Health",
+    "name" :"health",
     "icon" :"HEARTICO",
     "type" : "EXPENSE"
   },
   {
-    "name" :"Shopping",
+    "name" :"ahopping",
     "icon" :"SHOPPINGBAGICO",
     "type" : "EXPENSE"
   },
   {
-    "name" :"Another",
+    "name" :"other",
     "icon" :"MOREHORIZONTALICON",
     "type" : "EXPENSE"
+  },
+  {
+    "name" :"salary",
+    "icon" :"HOMEICO",
+    "type" : "INCOME"
+  },
+  {
+    "name" :"freelance",
+    "icon" :"HOMEICO",
+    "type" : "INCOME"
+  },
+  {
+    "name" :"investments",
+    "icon" :"HOMEICO",
+    "type" : "INCOME"
+  },
+  {
+    "name" :"business",
+    "icon" :"HOMEICO",
+    "type" : "INCOME"
+  },
+  {
+    "name" :"other",
+    "icon" :"HOMEICO",
+    "type" : "INCOME"
   }
 ]
