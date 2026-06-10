@@ -55,14 +55,12 @@ public class AuthService {
     }
 
     public AuthResponse register(RegisterRequest request) {
-        if (userRepo.findByEmail(request.email()).isPresent()) {
-            throw new ValidationRequestBodyCustomException("email: is already in use", "body.email" );
-        }
+        if (userRepo.existsByEmail(request.email())) throw new ValidationRequestBodyCustomException("email: is already in use", "body.email" );
+        if (userRepo.existsByUsername(request.username())) throw new ValidationRequestBodyCustomException("username: is already in use", "body.username" );
 
         Role defaultRole = roleRepo.findByName("USER").orElseThrow(() -> new RuntimeException("Default role not found"));
-
         User user = User.builder()
-                .name(request.name())
+                .username(request.username())
                 .email(request.email())
                 .password(passwordEncoder.encode(request.password()))
                 .role(defaultRole)

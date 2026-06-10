@@ -1,18 +1,20 @@
 package com.app.dto.v1.auth;
 
 import com.app.enums.user.CurrencyType;
+import com.app.validation.password.ValidPassword;
+import com.app.validation.username.ValidUsername;
 import jakarta.validation.constraints.*;
 
 public record RegisterRequest(
         @NotNull()
-        @Size(min = 3)
-        String name,
+        @ValidUsername
+        String username,
 
         @NotNull()
         @Email()
         String email,
 
         @NotNull()
-        @Size(min = 8)
+        @ValidPassword
         String password
 ) {}

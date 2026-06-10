@@ -15,6 +15,7 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     Optional<User> findByEmail(String email);
 
     Boolean existsByEmail(String email);
+    Boolean existsByUsername(String username);
 
     @Query(
             value = "SELECT COUNT(users.id) > 0 FROM users WHERE id = :userId AND :tokenHash = ANY(tokens)",
