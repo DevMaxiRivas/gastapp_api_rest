@@ -1,6 +1,5 @@
 package com.app.service.transaction.impl;
 
-import com.app.dto.v1.ApiResponse;
 import com.app.dto.v1.transaction.TransactionCreateDTO;
 import com.app.dto.v1.transaction.TransactionResponseDTO;
 import com.app.exception.body.ValidationRequestBodyCustomException;
@@ -11,7 +10,6 @@ import com.app.model.Transaction;
 import com.app.model.User;
 import com.app.repository.CategoryRepository;
 import com.app.repository.TransactionRepository;
-import com.app.repository.UserRepository;
 import com.app.service.transaction.TransactionService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +30,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Transactional
     public TransactionResponseDTO create(TransactionCreateDTO dto, User user) {
         Category category = categoryRepository.findById(dto.categoryId())
-                .orElseThrow(() -> new ValidationRequestBodyCustomException("Category not found", "body.categoryId"));
+                .orElseThrow(() -> new ValidationRequestBodyCustomException("categoryId: is invalid.", "body.categoryId"));
         Transaction transaction = new Transaction();
 
         transaction.setUser(user);
