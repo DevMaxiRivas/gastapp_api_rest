@@ -35,11 +35,8 @@ public class ProfileServiceImpl implements ProfileService {
             throw new ProfileAlreadyCreatedException();
         }
 
-        Profile profile = Profile.builder()
-                .user_id(user.getId())
-                .currency(dto.getCurrency())
-                .currentBudget(dto.getCurrentBudget())
-                .build();
+        Profile profile = mapper.toEntity(dto);
+        profile.setUserId(user.getId());
 
         if (avatarImage != null) {
             String newFileName = storageService.save(
@@ -54,7 +51,6 @@ public class ProfileServiceImpl implements ProfileService {
         }
 
         repo.save(profile);
-        System.out.println("Avatar:" + profile.getAvatarUrl());
         return mapper.toDto(profile);
     }
 

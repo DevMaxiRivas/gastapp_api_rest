@@ -1,5 +1,6 @@
 package com.app.mapper.profile;
 
+import com.app.dto.v1.profile.ProfileCreateDTO;
 import com.app.dto.v1.profile.ProfileResponseDTO;
 import com.app.mapper.config.GlobalMapperConfig;
 import com.app.mapper.helper.StorageMapper;
@@ -22,5 +23,6 @@ public interface ProfileMapper {
 
     @Mapping(target = "user_id", ignore = true)
     @Mapping(target = "user", ignore = true)
-    Profile toEntity(ProfileResponseDTO dto);
+    @Mapping(target = "avatarUrl", ignore = true)
+    Profile toEntity(ProfileCreateDTO dto);
 }

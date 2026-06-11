@@ -56,7 +56,6 @@ public class AuthService {
 
     public AuthResponse register(RegisterRequest request) {
         User test = authMapper.toEntity(request);
-        System.out.println("register mapping "+test.getEmail());
 
         String email = request.email().toLowerCase();
         if (userRepo.existsByEmail(email)) throw new ValidationRequestBodyCustomException("email: is already in use", "body.email" );
