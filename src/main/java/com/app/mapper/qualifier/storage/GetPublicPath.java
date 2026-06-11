@@ -1,5 +1,4 @@
-package com.app.mapper.qualifier;
-
+package com.app.mapper.qualifier.storage;
 
 import org.mapstruct.Qualifier;
 
@@ -11,5 +10,5 @@ import java.lang.annotation.Target;
 @Qualifier
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.CLASS)
-public @interface UpperCase {
+public @interface GetPublicPath {
 }

@@ -1,4 +1,4 @@
-package com.app.mapper.qualifier;
+package com.app.mapper.qualifier.string;
 
 import org.mapstruct.Qualifier;
 import java.lang.annotation.ElementType;
@@ -9,5 +9,5 @@ import java.lang.annotation.Target;
 @Qualifier
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.CLASS)
-public @interface LowerCase {
+public @interface Normalize {
 }

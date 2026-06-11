@@ -7,4 +7,5 @@ public interface FileStorageService {
      String save(MultipartFile file, String disk, String folder, String fileName, FileValidator validator);
      void delete(String disk, String folder, String fileName);
      Resource loadAsResource(String disk, String folder, String fileName);
+     String generateURLPublic(String pathFile);
 }

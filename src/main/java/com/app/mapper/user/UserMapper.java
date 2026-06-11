@@ -1,22 +1,33 @@
 package com.app.mapper.user;
 
 import com.app.dto.v1.user.UserResponseDTO;
+import com.app.mapper.config.GlobalMapperConfig;
+import com.app.mapper.helper.StringMapper;
+import com.app.mapper.profile.ProfileMapper;
+import com.app.mapper.qualifier.string.MaskEmail;
 import com.app.model.User;
-import com.app.util.MaskingUtils;
-import com.app.util.StorageUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", imports = {MaskingUtils.class, StorageUtils.class})
+@Mapper(
+    config= GlobalMapperConfig.class,
+    uses = {
+        StringMapper.class,
+        ProfileMapper.class
+    }
+)
 public interface UserMapper {
 
-    @Mapping(target = "email", expression = "java(MaskingUtils.maskEmail(user.getEmail()))")
-    @Mapping(target = "profile.avatarUrl", expression = "java(StorageUtils.generateURLPublic(profile.getAvatarUrl()))")
+    @Mapping(
+        target = "email",
+        source = "email",
+        qualifiedBy = MaskEmail.class
+    )
     UserResponseDTO toDto(User user);
 
-    User toEntity(UserResponseDTO dto);
+//    User toEntity(UserResponseDTO dto);
 
     List<UserResponseDTO> toDtoList(List<User> users);
 }

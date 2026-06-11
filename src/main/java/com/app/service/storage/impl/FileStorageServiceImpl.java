@@ -29,6 +29,8 @@ public class FileStorageServiceImpl implements FileStorageService {
     @Value("${spring.application.storage.public-path}")
     private String privateRoot;
 
+    private static final String STORAGE_URL_PUBLIC = "/storage/public/";
+
     private Path determineStoragePath(String disk){
         return "public".equals(disk) ? Paths.get(publicRoot) : Paths.get(privateRoot);
     }
@@ -80,6 +82,13 @@ public class FileStorageServiceImpl implements FileStorageService {
         } catch (MalformedURLException e) {
             throw new ResourceNotFoundCustomException("The file was not found: " + fileName, "url");
         }
+    }
+
+    public String generateURLPublic(String pathFile) {
+        if(pathFile != null) {
+            return STORAGE_URL_PUBLIC + pathFile;
+        }
+        return null;
     }
 
 }

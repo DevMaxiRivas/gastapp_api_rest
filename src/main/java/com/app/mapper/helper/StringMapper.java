@@ -1,12 +1,15 @@
 package com.app.mapper.helper;
 
-import com.app.mapper.qualifier.LowerCase;
-import com.app.mapper.qualifier.Trim;
-import com.app.mapper.qualifier.UpperCase;
+import com.app.mapper.qualifier.string.*;
 import org.springframework.stereotype.Component;
 
 @Component
 public class StringMapper {
+
+    @Normalize
+    public String normalize(String value){
+        return value.toLowerCase().trim();
+    }
 
     @Trim
     public String trim(String value) {
@@ -27,5 +30,10 @@ public class StringMapper {
     @LowerCase
     public String lowerCase(String value) {
         return value == null ? null : value.toLowerCase();
+    }
+
+    @MaskEmail
+    public String maskEmail(String email) {
+        return email.replaceAll("(?<=.{1}).(?=.*@)", "*");
     }
 }

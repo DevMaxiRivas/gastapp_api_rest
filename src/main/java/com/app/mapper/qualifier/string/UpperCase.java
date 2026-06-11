@@ -1,4 +1,4 @@
-package com.app.mapper.qualifier;
+package com.app.mapper.qualifier.string;
 
 
 import org.mapstruct.Qualifier;
@@ -11,5 +11,5 @@ import java.lang.annotation.Target;
 @Qualifier
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.CLASS)
-public @interface Trim {
+public @interface UpperCase {
 }
