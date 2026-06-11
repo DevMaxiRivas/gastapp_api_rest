@@ -31,14 +31,10 @@ public class TransactionServiceImpl implements TransactionService {
     public TransactionResponseDTO create(TransactionCreateDTO dto, User user) {
         Category category = categoryRepository.findById(dto.categoryId())
                 .orElseThrow(() -> new ValidationRequestBodyCustomException("categoryId: is invalid.", "body.categoryId"));
-        Transaction transaction = new Transaction();
 
+        Transaction transaction = mapper.toEntity(dto);
         transaction.setUser(user);
         transaction.setCategory(category);
-        transaction.setAmount(dto.amount());
-        transaction.setNote(dto.note());
-        transaction.setTransactionDate(dto.transactionDate());
-        transaction.setType(dto.type());
         transactionRepository.save(transaction);
         return mapper.toDto(transaction);
     }
