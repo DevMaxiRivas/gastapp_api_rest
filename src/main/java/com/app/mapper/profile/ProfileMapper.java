@@ -21,7 +21,7 @@ public interface ProfileMapper {
     )
     ProfileResponseDTO toDto(Profile profile);
 
-    @Mapping(target = "user_id", ignore = true)
+    @Mapping(target = "userId", ignore = true)
     @Mapping(target = "user", ignore = true)
     @Mapping(target = "avatarUrl", ignore = true)
     Profile toEntity(ProfileCreateDTO dto);
