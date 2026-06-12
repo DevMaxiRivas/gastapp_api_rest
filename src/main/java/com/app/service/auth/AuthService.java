@@ -3,14 +3,11 @@ package com.app.service.auth;
 import com.app.dto.v1.auth.*;
 import com.app.dto.v1.auth.claim.TokenClaimDTO;
 import com.app.enums.token.TokenTypeEnum;
-import com.app.exception.GenericErrorException;
 import com.app.exception.app.auth.jwt.InvalidJwtCustomException;
 import com.app.exception.body.ValidationRequestBodyCustomException;
 import com.app.mapper.auth.AuthMapper;
-import com.app.model.Role;
 import com.app.model.User;
-import com.app.repository.RoleRepository;
-import com.app.repository.UserRepository;
+import com.app.service.user.UserService;
 import com.app.util.HashingUtils;
 import com.app.util.MapUtils;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -18,22 +15,17 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final UserRepository userRepo;
-    private final RoleRepository roleRepo;
+    private final UserService userService;
 
     private final JwtService jwtService;
-    private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authManager;
 
     private final AuthMapper  authMapper;
@@ -47,61 +39,36 @@ public class AuthService {
     }
 
     protected void removeRefreshToken(String email, String refreshToken) {
-        User user = userRepo.findByEmail(email)
+        User user = userService.findByEmail(email)
                 .orElseThrow(InvalidJwtCustomException::new);
 
         String hashToken = HashingUtils.hashToken(refreshToken);
-        userRepo.removeToken(user.getId(), hashToken);
+        userService.removeRefreshToken(user, hashToken);
     }
 
     public AuthResponse register(RegisterRequest request) {
-        User test = authMapper.toEntity(request);
-
-        String email = request.email().toLowerCase();
-        if (userRepo.existsByEmail(email)) throw new ValidationRequestBodyCustomException("email: is already in use", "body.email" );
-        if (userRepo.existsByUsername(request.username())) throw new ValidationRequestBodyCustomException("username: is already in use", "body.username" );
-
-        Role defaultRole = roleRepo.findByName("USER").orElseThrow(() -> new RuntimeException("Default role not found"));
-        User user = User.builder()
-                .username(request.username())
-                .email(email)
-                .password(passwordEncoder.encode(request.password()))
-                .role(defaultRole)
-                .tokens(List.of())
-                .build();
-
-        userRepo.save(user);
-
+        User user = userService.create(request);
         AuthResponse authResponse = generateTokens(user);
-        user.setTokens(List.of(
-                HashingUtils.hashToken(authResponse.refreshToken())
-        ));
-        userRepo.save(user);
+        String hashToken = HashingUtils.hashToken(authResponse.refreshToken());
+        userService.addRefreshToken(user, hashToken);
 
         return authResponse;
     }
 
-    @Transactional
     public AuthResponse login(LoginRequest request) {
         authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        request.email(),
+                        request.email().toLowerCase(),
                         request.password()
                 )
         );
 
-        User user = userRepo.findByEmail(request.email())
+        User user = userService.findByEmail(request.email())
                 .orElseThrow(() -> new ValidationRequestBodyCustomException("User not found", "body.email"));
 
         AuthResponse authResponse = generateTokens(user);
-
-        List<String> currentTokens = user.getTokens() != null ? user.getTokens() : new ArrayList<String>();
-        currentTokens.add(
-                HashingUtils.hashToken(authResponse.refreshToken())
-        );
-
-        user.setTokens(currentTokens);
-        userRepo.save(user);
+        String hashToken = HashingUtils.hashToken(authResponse.refreshToken());
+        userService.addRefreshToken(user, hashToken);
         return authResponse;
     }
 
@@ -123,13 +90,13 @@ public class AuthService {
     public AccessTokenResponse refresh(String refreshToken) {
         try {
             String email = jwtService.extractEmail(new Token(refreshToken, TokenTypeEnum.REFRESH_TOKEN));
-            User user = userRepo.findByEmail(email)
+            User user = userService.findByEmail(email)
                     .orElseThrow(() -> new ValidationRequestBodyCustomException("User not found", "token.email"));
 
             TokenClaimDTO data = authMapper.toDto(user);
             Map<String, Object> map = MapUtils.convertToMap(data);
-            String token = jwtService.generateToken(user, map, TokenTypeEnum.ACCESS_TOKEN);
-            return new AccessTokenResponse(token);
+            String accessToken = jwtService.generateToken(user, map, TokenTypeEnum.ACCESS_TOKEN);
+            return new AccessTokenResponse(accessToken);
         } catch (Exception e) {
             if (e instanceof ExpiredJwtException) {
                 String email = ((ExpiredJwtException) e).getClaims().getSubject();

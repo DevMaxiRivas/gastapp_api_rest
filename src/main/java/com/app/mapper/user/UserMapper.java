@@ -1,10 +1,13 @@
 package com.app.mapper.user;
 
+import com.app.dto.v1.auth.RegisterRequest;
 import com.app.dto.v1.user.UserResponseDTO;
 import com.app.mapper.config.GlobalMapperConfig;
 import com.app.mapper.helper.StringMapper;
 import com.app.mapper.profile.ProfileMapper;
+import com.app.mapper.qualifier.string.EncodePassword;
 import com.app.mapper.qualifier.string.MaskEmail;
+import com.app.mapper.qualifier.string.Normalize;
 import com.app.model.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -27,7 +30,21 @@ public interface UserMapper {
     )
     UserResponseDTO toDto(User user);
 
-//    User toEntity(UserResponseDTO dto);
+    @Mapping(
+            target = "email",
+            source = "email",
+            qualifiedBy = Normalize.class
+    )
+    @Mapping(
+            target = "password",
+            source = "password",
+            qualifiedBy = EncodePassword.class
+    )
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "tokens", ignore = true)
+    @Mapping(target = "profile", ignore = true)
+    @Mapping(target = "role", ignore = true)
+    User toEntity(RegisterRequest dto);
 
     List<UserResponseDTO> toDtoList(List<User> users);
 }
