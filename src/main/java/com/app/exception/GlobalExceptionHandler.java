@@ -12,6 +12,7 @@ import com.app.exception.header.MissingHeaderCustomException;
 import com.app.exception.app.auth.jwt.ExpiredJwtCustomException;
 
 import com.app.exception.method.HttpRequestMethodNotSupportedCustomException;
+import com.app.exception.query_params.PropertyReferenceCustomException;
 import com.app.exception.resource.ResourceNotFoundCustomException;
 import com.app.exception.validation.MethodArgumentNotValidCustomException;
 import com.app.exception.validation.MissingServletRequestPartCustomException;
@@ -19,6 +20,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.http.HttpServletRequest;
 
+import org.springframework.data.core.PropertyReferenceException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -100,6 +102,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<ErrorResponse> handleHttpMethodNotSupported(HttpRequestMethodNotSupportedException ex, HttpServletRequest request) {
         return (new HttpRequestMethodNotSupportedCustomException(ex)).buildErrorResponse(request);
+    }
+
+    @ExceptionHandler(PropertyReferenceException.class)
+    public ResponseEntity<ErrorResponse> handlePropertyReference(PropertyReferenceException ex, HttpServletRequest request) {
+        PropertyReferenceCustomException exception = new PropertyReferenceCustomException(ex);
+        exception.printLogs();
+        return exception.buildErrorResponse(request);
     }
 
     // Generic Error
