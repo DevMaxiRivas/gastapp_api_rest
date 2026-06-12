@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -40,5 +41,9 @@ public class CategoryServiceImpl implements CategoryService {
     public Category createCustomCategory(Category category, User user) {
         category.setUser(user);
         return repo.save(category);
+    }
+
+    public Optional<Category> findById(Long id) {
+        return repo.findById(id);
     }
 }

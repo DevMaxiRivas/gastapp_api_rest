@@ -11,6 +11,7 @@ import com.app.model.Transaction;
 import com.app.model.User;
 import com.app.repository.CategoryRepository;
 import com.app.repository.TransactionRepository;
+import com.app.service.category.CategoryService;
 import com.app.service.transaction.TransactionService;
 import com.app.specification.transaction.TransactionSpecification;
 import jakarta.transaction.Transactional;
@@ -28,14 +29,13 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
     private final TransactionRepository repo;
-    private final CategoryRepository categoryRepository;
+    private final CategoryService categoryService;
     private final TransactionMapper mapper;
-
 
     @Override
     @Transactional
     public TransactionResponseDTO create(TransactionCreateDTO dto, User user) {
-        Category category = categoryRepository.findById(dto.categoryId())
+        Category category = categoryService.findById(dto.categoryId())
                 .orElseThrow(() -> new ValidationRequestBodyCustomException("categoryId: is invalid.", "body.categoryId"));
 
         Transaction transaction = mapper.toEntity(dto);
