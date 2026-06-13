@@ -6,10 +6,10 @@ import java.time.LocalDate;
 
 public record QueryParamsFilterDailyBalanceDTO (
         @NotNull
-        LocalDate startTransactionDate,
+        LocalDate fromDate,
 
         @NotNull
-        LocalDate endTransactionDate,
+        LocalDate toDate,
 
         Long categoryId,
 

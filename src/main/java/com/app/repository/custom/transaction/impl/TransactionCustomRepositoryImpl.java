@@ -47,7 +47,7 @@ public class TransactionCustomRepositoryImpl implements TransactionCustomReposit
 
         // 2. Cláusula WHERE
         Predicate userPredicate = cb.equal(root.get("user").get("id"), userId);
-        Predicate datePredicate = cb.between(root.get("transactionDate"), filter.startTransactionDate(), filter.endTransactionDate());
+        Predicate datePredicate = cb.between(root.get("transactionDate"), filter.fromDate(), filter.toDate());
         query.where(cb.and(userPredicate, datePredicate));
 
         // 3. GROUP BY y ORDER BY
