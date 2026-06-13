@@ -1,6 +1,8 @@
 package com.app.service.transaction;
 
-import com.app.dto.v1.dashboard.TransactionHistoryByMonthDTO;
+import com.app.dto.v1.dashboard.transaction.QueryParamsFilterDailyBalanceDTO;
+import com.app.dto.v1.dashboard.transaction.TransactionDailyBalanceDTO;
+import com.app.dto.v1.dashboard.transaction.TransactionHistoryByMonthDTO;
 import com.app.dto.v1.transaction.QueryParamsTransactionFilterDTO;
 import com.app.dto.v1.transaction.TransactionCreateDTO;
 import com.app.dto.v1.transaction.TransactionResponseDTO;
@@ -20,5 +22,6 @@ public interface TransactionService {
     List<TransactionResponseDTO> getRecentTransactions(Long userId, int quantity);
 
     List<TransactionHistoryByMonthDTO>  getTransactionHistoryByMonth(Long userId, LocalDate startDate, LocalDate endDate);
+    List<TransactionDailyBalanceDTO> getDailyBalance(Long userId, QueryParamsFilterDailyBalanceDTO filter);
 
 }

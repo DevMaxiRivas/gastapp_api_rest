@@ -3,11 +3,15 @@ package com.app.specification.transaction;
 import com.app.dto.v1.transaction.QueryParamsTransactionFilterDTO;
 import com.app.model.Transaction;
 import jakarta.persistence.criteria.Predicate;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
+@RequiredArgsConstructor
 public class TransactionSpecification {
     public static Specification<Transaction> filterBy(QueryParamsTransactionFilterDTO filters, Long userId) {
         return (root, query, cb) -> {

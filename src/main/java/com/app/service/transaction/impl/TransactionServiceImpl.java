@@ -1,6 +1,8 @@
 package com.app.service.transaction.impl;
 
-import com.app.dto.v1.dashboard.TransactionHistoryByMonthDTO;
+import com.app.dto.v1.dashboard.transaction.QueryParamsFilterDailyBalanceDTO;
+import com.app.dto.v1.dashboard.transaction.TransactionDailyBalanceDTO;
+import com.app.dto.v1.dashboard.transaction.TransactionHistoryByMonthDTO;
 import com.app.dto.v1.transaction.QueryParamsTransactionFilterDTO;
 import com.app.dto.v1.transaction.TransactionCreateDTO;
 import com.app.dto.v1.transaction.TransactionResponseDTO;
@@ -10,7 +12,6 @@ import com.app.mapper.transaction.TransactionMapper;
 import com.app.model.Category;
 import com.app.model.Transaction;
 import com.app.model.User;
-import com.app.repository.CategoryRepository;
 import com.app.repository.TransactionRepository;
 import com.app.service.category.CategoryService;
 import com.app.service.transaction.TransactionService;
@@ -88,5 +89,10 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public List<TransactionHistoryByMonthDTO> getTransactionHistoryByMonth(Long userId, LocalDate startDate, LocalDate endDate) {
         return repo.getTransactionHistoryByMonth(userId, startDate, endDate);
+    }
+
+    @Override
+    public List<TransactionDailyBalanceDTO> getDailyBalance(Long userId, QueryParamsFilterDailyBalanceDTO filter) {
+        return repo.getDailyBalance(userId, filter);
     }
 }

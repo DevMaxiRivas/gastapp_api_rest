@@ -2,6 +2,7 @@ package com.app.model;
 
 import com.app.enums.category.CategoryIconEnum;
 import com.app.enums.category.CategoryTypeEnum;
+import com.app.enums.transaction.TransactionTypeEnum;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -29,7 +30,7 @@ public class Category {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 40)
-    private CategoryTypeEnum type;
+    private TransactionTypeEnum type;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

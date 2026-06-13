@@ -1,4 +1,4 @@
-package com.app.dto.v1.dashboard;
+package com.app.dto.v1.dashboard.transaction;
 
 import com.app.enums.transaction.TransactionTypeEnum;
 

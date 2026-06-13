@@ -1,9 +1,9 @@
 package com.app.repository;
 
-import com.app.dto.v1.dashboard.TransactionHistoryByMonthDTO;
+import com.app.dto.v1.dashboard.transaction.TransactionHistoryByMonthDTO;
 import com.app.enums.transaction.TransactionTypeEnum;
-import com.app.model.Category;
 import com.app.model.Transaction;
+import com.app.repository.custom.transaction.TransactionCustomRepository;
 import org.springframework.data.domain.Limit;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,7 +17,10 @@ import java.util.List;
 
 
 @Repository
-public interface TransactionRepository extends JpaRepository<Transaction, Long>, JpaSpecificationExecutor<Transaction> {
+public interface TransactionRepository
+        extends JpaRepository<Transaction, Long>, JpaSpecificationExecutor<Transaction>
+        , TransactionCustomRepository
+{
     List<Transaction> findByUserIdOrderByTransactionDateDesc(Long userId);
     List<Transaction> findByUserIdAndTransactionDateBetween(Long userId, LocalDate start, LocalDate end);
     List<Transaction> findByUserId(Long userId, Sort sort, Limit limit);
@@ -25,7 +28,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
     List<Transaction> findByUserIdAndCategoryId(Long userId, Long categoryId);
 
     @Query(
-            "SELECT new com.app.dto.v1.dashboard.TransactionHistoryByMonthDTO(" +
+            "SELECT new com.app.dto.v1.dashboard.transaction.TransactionHistoryByMonthDTO(" +
                     "EXTRACT(YEAR FROM t.transactionDate) as year, " +
                     "EXTRACT(month FROM t.transactionDate) as month, " +
                     "t.type as type, " +

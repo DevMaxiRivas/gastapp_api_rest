@@ -1,6 +1,5 @@
 package com.app.db.seeder.transaction;
 
-import com.app.enums.transaction.TransactionTypeEnum;
 import com.app.model.Category;
 import com.app.model.Transaction;
 import com.app.model.User;
@@ -66,11 +65,12 @@ public class TransactionSeeder implements CommandLineRunner {
         Faker faker = new Faker(new Locale("en"));
 
         for (int i = 0; i < quantityToCreate; i++) {
+            Category category = categories.get((int)Math.round(Math.random() * (categories.size() - 1)));
             Transaction transaction = Transaction.builder()
                 .amount(BigDecimal.valueOf(Math.round(minAmount + Math.random()*(maxAmount - minAmount + 1 ))))
-                .category(categories.get((int)Math.round(Math.random() * (categories.size() - 1))))
+                .category(category)
                 .user(users.get((int)Math.round(Math.random() * (users.size() - 1))))
-                .type(Math.random() > 0.5 ? TransactionTypeEnum.EXPENSE : TransactionTypeEnum.INCOME)
+                .type(category.getType())
                 .note(faker.lorem().sentence())
                 .transactionDate(LocalDate.now().minusDays(Math.round(Math.random() * maxDays)))
                 .build();
