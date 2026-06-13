@@ -1,5 +1,6 @@
 package com.app.service.transaction.impl;
 
+import com.app.dto.v1.dashboard.TransactionHistoryByMonthDTO;
 import com.app.dto.v1.transaction.QueryParamsTransactionFilterDTO;
 import com.app.dto.v1.transaction.TransactionCreateDTO;
 import com.app.dto.v1.transaction.TransactionResponseDTO;
@@ -16,8 +17,10 @@ import com.app.service.transaction.TransactionService;
 import com.app.specification.transaction.TransactionSpecification;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Limit;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -69,5 +72,21 @@ public class TransactionServiceImpl implements TransactionService {
         Specification<Transaction> spec = TransactionSpecification.filterBy(filters, userId);
         return repo.findAll(spec, pageable)
                 .map(mapper::toDto);
+    }
+
+    @Override
+    public List<TransactionResponseDTO> getRecentTransactions(Long userId, int quantity) {
+        Limit limit = Limit.of(quantity);
+        Sort sort = Sort.by(Sort.Direction.DESC, "transactionDate");
+
+        return repo.findByUserId(userId, sort, limit)
+                .stream()
+                .map(mapper::toDto)
+                .toList();
+    }
+
+    @Override
+    public List<TransactionHistoryByMonthDTO> getTransactionHistoryByMonth(Long userId, LocalDate startDate, LocalDate endDate) {
+        return repo.getTransactionHistoryByMonth(userId, startDate, endDate);
     }
 }
