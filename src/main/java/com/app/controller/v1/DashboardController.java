@@ -3,6 +3,7 @@ package com.app.controller.v1;
 import com.app.dto.v1.ApiResponse;
 import com.app.dto.v1.dashboard.SummaryDTO;
 import com.app.dto.v1.dashboard.transaction.QueryParamsFilterDailyBalanceDTO;
+import com.app.dto.v1.dashboard.transaction.SummaryBudgetDTO;
 import com.app.dto.v1.dashboard.transaction.TransactionDailyBalanceDTO;
 import com.app.model.User;
 import com.app.service.dashboard.DashboardService;
@@ -31,6 +32,19 @@ public class DashboardController {
                 .body(
                         ApiResponse.success(
                                 service.getSummary(user)
+                        )
+                );
+    }
+
+    @GetMapping("/summary/budget")
+    public ResponseEntity<ApiResponse<SummaryBudgetDTO>> getBudgetSummary(
+            @AuthenticationPrincipal User user
+    ) {
+        return ResponseEntity
+                .ok()
+                .body(
+                        ApiResponse.success(
+                                service.getBudgetSummary(user)
                         )
                 );
     }

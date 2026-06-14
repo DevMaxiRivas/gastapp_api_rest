@@ -6,6 +6,7 @@ import com.app.dto.v1.dashboard.transaction.TransactionHistoryByMonthDTO;
 import com.app.dto.v1.transaction.QueryParamsTransactionFilterDTO;
 import com.app.dto.v1.transaction.TransactionCreateDTO;
 import com.app.dto.v1.transaction.TransactionResponseDTO;
+import com.app.enums.transaction.TransactionTypeEnum;
 import com.app.exception.body.ValidationRequestBodyCustomException;
 import com.app.exception.resource.ResourceNotFoundCustomException;
 import com.app.mapper.transaction.TransactionMapper;
@@ -25,6 +26,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
@@ -84,6 +86,11 @@ public class TransactionServiceImpl implements TransactionService {
                 .stream()
                 .map(mapper::toDto)
                 .toList();
+    }
+
+    @Override
+    public BigDecimal getTotalAmount(Long userId, LocalDate fromDate, LocalDate toDate, TransactionTypeEnum type) {
+        return repo.getTotalAmount(userId, fromDate, toDate, type);
     }
 
     @Override

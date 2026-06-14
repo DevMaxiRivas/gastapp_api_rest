@@ -13,6 +13,8 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class TransactionCustomRepositoryImpl implements TransactionCustomRepository {
@@ -56,4 +58,28 @@ public class TransactionCustomRepositoryImpl implements TransactionCustomReposit
 
         return entityManager.createQuery(query).getResultList();
     }
+
+    @Override
+    public BigDecimal getTotalAmount(Long userId, LocalDate fromDate, LocalDate toDate, TransactionTypeEnum type) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<BigDecimal> query = cb.createQuery(BigDecimal.class);
+        Root<Transaction> root = query.from(Transaction.class);
+
+        query.select(
+            cb.sum(root.get("amount"))
+        );
+
+        ArrayList<Predicate> predicates = new ArrayList<>();
+
+        predicates.add(cb.equal(root.get("user").get("id"), userId));
+        predicates.add(cb.between(root.get("transactionDate"), fromDate, toDate));
+        predicates.add(cb.equal(root.get("type"), type));
+
+        query.where(cb.and(predicates));
+
+        List<BigDecimal> result = entityManager.createQuery(query).getResultList();
+        return result.isEmpty() ? BigDecimal.ZERO : result.get(0);
+    }
+
+
 }
