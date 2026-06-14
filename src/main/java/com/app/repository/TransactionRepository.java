@@ -40,7 +40,7 @@ public interface TransactionRepository
             "AND " +
                 "t.transactionDate BETWEEN :startDate AND :endDate " +
             "GROUP BY year, month, type " +
-            "ORDER BY year, month, type "
+            "ORDER BY year DESC, month DESC, type "
     )
     List<TransactionHistoryByMonthDTO> getTransactionHistoryByMonth(
             @Param("userId") Long userId,
