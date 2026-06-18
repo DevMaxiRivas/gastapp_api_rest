@@ -5,6 +5,6 @@ import java.time.LocalDate;
 
 public record TransactionDailyBalanceDTO(
         LocalDate date,
-        BigDecimal totalExpense,
-        BigDecimal totalIncome
+        BigDecimal totalIncome,
+        BigDecimal totalExpense
 ){}
