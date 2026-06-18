@@ -7,7 +7,7 @@ import com.app.dto.v1.transaction.QueryParamsTransactionFilterDTO;
 import com.app.dto.v1.transaction.TransactionCreateDTO;
 import com.app.dto.v1.transaction.TransactionResponseDTO;
 import com.app.enums.transaction.TransactionTypeEnum;
-import com.app.event.TransactionCreatedEvent;
+import com.app.event.transaction.TransactionCreatedEvent;
 import com.app.exception.body.ValidationRequestBodyCustomException;
 import com.app.exception.resource.ResourceNotFoundCustomException;
 import com.app.mapper.transaction.TransactionMapper;

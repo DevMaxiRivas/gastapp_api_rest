@@ -32,6 +32,8 @@ import org.springframework.web.bind.MissingRequestCookieException;
 import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.async.AsyncRequestNotUsableException;
+import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
@@ -109,6 +111,11 @@ public class GlobalExceptionHandler {
         PropertyReferenceCustomException exception = new PropertyReferenceCustomException(ex);
         exception.printLogs();
         return exception.buildErrorResponse(request);
+    }
+
+    // Ignore exception for threads
+    @ExceptionHandler({AsyncRequestTimeoutException.class, AsyncRequestNotUsableException.class})
+    public void handleAsyncRequestTimeoutException(Exception ex, HttpServletRequest response) {
     }
 
     // Generic Error

@@ -2,6 +2,7 @@ package com.app.config.auth;
 
 import com.app.middleware.auth.JwtAuthFilter;
 import com.app.repository.UserRepository;
+import jakarta.servlet.DispatcherType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -86,6 +87,8 @@ public class SecurityConfig {
                                 )
                                 .permitAll()
 
+                                // Enable the sending of asynchronous events
+                                .dispatcherTypeMatchers(DispatcherType.ASYNC).permitAll()
                                 // Authenticate all other requests
                                 .anyRequest()
                                 .authenticated()
