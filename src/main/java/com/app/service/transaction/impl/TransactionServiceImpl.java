@@ -7,6 +7,7 @@ import com.app.dto.v1.transaction.QueryParamsTransactionFilterDTO;
 import com.app.dto.v1.transaction.TransactionCreateDTO;
 import com.app.dto.v1.transaction.TransactionResponseDTO;
 import com.app.enums.transaction.TransactionTypeEnum;
+import com.app.event.TransactionCreatedEvent;
 import com.app.exception.body.ValidationRequestBodyCustomException;
 import com.app.exception.resource.ResourceNotFoundCustomException;
 import com.app.mapper.transaction.TransactionMapper;
@@ -19,6 +20,7 @@ import com.app.service.transaction.TransactionService;
 import com.app.specification.transaction.TransactionSpecification;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Limit;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,12 +30,16 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
+    // Event Manager
+    private final ApplicationEventPublisher eventPublisher;
+
     private final TransactionRepository repo;
     private final CategoryService categoryService;
     private final TransactionMapper mapper;
@@ -48,6 +54,13 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.setUser(user);
         transaction.setCategory(category);
         repo.save(transaction);
+
+        eventPublisher.publishEvent(
+            new TransactionCreatedEvent(
+                    transaction.getUser().getId().toString()
+            )
+        );
+
         return mapper.toDto(transaction);
     }
 
@@ -80,7 +93,12 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public List<TransactionResponseDTO> getRecentTransactions(Long userId, int quantity) {
         Limit limit = Limit.of(quantity);
-        Sort sort = Sort.by(Sort.Direction.DESC, "transactionDate");
+        List<Sort.Order> orders = new ArrayList<>();
+
+        orders.add(Sort.Order.desc("transactionDate"));
+        orders.add(Sort.Order.desc("createdAt"));
+
+        Sort sort = Sort.by(orders);
 
         return repo.findByUserId(userId, sort, limit)
                 .stream()
