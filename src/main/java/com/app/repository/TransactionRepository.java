@@ -26,25 +26,4 @@ public interface TransactionRepository
     List<Transaction> findByUserId(Long userId, Sort sort, Limit limit);
     List<Transaction> findByUserIdAndType(Long userId, TransactionTypeEnum type);
     List<Transaction> findByUserIdAndCategoryId(Long userId, Long categoryId);
-
-    @Query(
-            "SELECT new com.app.dto.v1.dashboard.transaction.TransactionHistoryByMonthDTO(" +
-                    "EXTRACT(YEAR FROM t.transactionDate) as year, " +
-                    "EXTRACT(month FROM t.transactionDate) as month, " +
-                    "t.type as type, " +
-                    "SUM(t.amount) as amount " +
-            ")" +
-            "FROM Transaction t " +
-            "WHERE " +
-                "t.user.id = :userId " +
-            "AND " +
-                "t.transactionDate BETWEEN :startDate AND :endDate " +
-            "GROUP BY year, month, type " +
-            "ORDER BY year DESC, month DESC, type "
-    )
-    List<TransactionHistoryByMonthDTO> getTransactionHistoryByMonth(
-            @Param("userId") Long userId,
-            @Param("startDate") LocalDate startDate,
-            @Param("endDate") LocalDate endDate
-    );
 }
