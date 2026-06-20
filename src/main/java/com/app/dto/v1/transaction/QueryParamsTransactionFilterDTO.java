@@ -7,6 +7,7 @@ import java.util.List;
 public record QueryParamsTransactionFilterDTO(
         Long userId,
         TransactionTypeEnum type,
+        String noteContains,
         LocalDate startTransactionDate,
         LocalDate endTransactionDate,
         Long minAmount,

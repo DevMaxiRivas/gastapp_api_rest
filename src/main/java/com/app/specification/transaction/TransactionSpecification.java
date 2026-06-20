@@ -42,6 +42,14 @@ public class TransactionSpecification {
                 );
             }
 
+            if (filters.noteContains() != null && !filters.noteContains().isBlank()) {
+                predicates.add(
+                        cb.like(
+                                cb.lower(root.get("note")), "%" + filters.noteContains().toLowerCase() + "%"
+                        )
+                );
+            }
+
             if (filters.startTransactionDate() != null && filters.endTransactionDate() != null) {
                 predicates.add(
                         cb.between(
