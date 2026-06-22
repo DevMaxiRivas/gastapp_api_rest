@@ -32,7 +32,11 @@ public class DashboardServiceImpl implements DashboardService {
 
         List<TransactionResponseDTO> lastTransactions = transactionService.getRecentTransactions(user.getId(),5);
 
-        return new SummaryDTO(historyTransactionByMonth, lastTransactions);
+        if(historyTransactionByMonth.isEmpty()){
+            return new SummaryDTO(null, lastTransactions);
+        }
+
+        return new SummaryDTO(historyTransactionByMonth.get(0), lastTransactions);
     }
 
     @Override

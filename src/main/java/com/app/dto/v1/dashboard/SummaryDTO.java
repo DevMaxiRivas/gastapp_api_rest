@@ -6,6 +6,6 @@ import com.app.dto.v1.transaction.TransactionResponseDTO;
 import java.util.List;
 
 public record SummaryDTO (
-        List<TransactionHistoryByMonthDTO> historyByMonth,
+        TransactionHistoryByMonthDTO currentAmounts,
         List<TransactionResponseDTO> recentTransactions
 ){}
