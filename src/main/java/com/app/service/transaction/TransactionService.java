@@ -6,6 +6,7 @@ import com.app.dto.v1.dashboard.transaction.TransactionHistoryByMonthDTO;
 import com.app.dto.v1.transaction.QueryParamsTransactionFilterDTO;
 import com.app.dto.v1.transaction.TransactionCreateDTO;
 import com.app.dto.v1.transaction.TransactionResponseDTO;
+import com.app.dto.v1.transaction.TransactionUpdateDTO;
 import com.app.enums.transaction.TransactionTypeEnum;
 import com.app.model.Transaction;
 import com.app.model.User;
@@ -18,6 +19,7 @@ import java.util.List;
 
 public interface TransactionService {
     TransactionResponseDTO create(TransactionCreateDTO dto, User user);
+    TransactionResponseDTO update(Long id, TransactionUpdateDTO dto, User user);
     List<Transaction> getMonthlyTransactions(Long userId, int month, int year);
     void delete(Long id);
     Page<TransactionResponseDTO> getFilteredPageable(QueryParamsTransactionFilterDTO filters, Pageable pageable, User user);

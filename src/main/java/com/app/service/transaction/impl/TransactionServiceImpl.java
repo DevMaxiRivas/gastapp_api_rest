@@ -6,6 +6,7 @@ import com.app.dto.v1.dashboard.transaction.TransactionHistoryByMonthDTO;
 import com.app.dto.v1.transaction.QueryParamsTransactionFilterDTO;
 import com.app.dto.v1.transaction.TransactionCreateDTO;
 import com.app.dto.v1.transaction.TransactionResponseDTO;
+import com.app.dto.v1.transaction.TransactionUpdateDTO;
 import com.app.enums.transaction.TransactionTypeEnum;
 import com.app.event.transaction.TransactionCreatedEvent;
 import com.app.exception.body.ValidationRequestBodyCustomException;
@@ -53,6 +54,8 @@ public class TransactionServiceImpl implements TransactionService {
         Transaction transaction = mapper.toEntity(dto);
         transaction.setUser(user);
         transaction.setCategory(category);
+        transaction.setType(category.getType());
+
         repo.save(transaction);
 
         eventPublisher.publishEvent(
@@ -62,6 +65,23 @@ public class TransactionServiceImpl implements TransactionService {
         );
 
         return mapper.toDto(transaction);
+    }
+
+    @Override
+    public TransactionResponseDTO update(Long id, TransactionUpdateDTO dto, User user) {
+        Transaction record = repo.findById(id).orElseThrow(() -> new ResourceNotFoundCustomException("transactionId: is invalid.", "URL"));
+        Transaction updatedRecord = mapper.toEntity(dto, record);
+
+        if(dto.categoryId() != null) {
+            Category category = categoryService.findById(dto.categoryId())
+                    .orElseThrow(() -> new ValidationRequestBodyCustomException("categoryId: is invalid.", "body.categoryId"));
+
+            updatedRecord.setCategory(category);
+            updatedRecord.setType(category.getType());
+        }
+
+        repo.save(updatedRecord);
+        return mapper.toDto(updatedRecord);
     }
 
     @Override

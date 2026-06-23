@@ -6,6 +6,7 @@ import com.app.dto.v1.category.QueryParamsCategoryFilterDTO;
 import com.app.dto.v1.transaction.QueryParamsTransactionFilterDTO;
 import com.app.dto.v1.transaction.TransactionCreateDTO;
 import com.app.dto.v1.transaction.TransactionResponseDTO;
+import com.app.dto.v1.transaction.TransactionUpdateDTO;
 import com.app.model.User;
 import com.app.service.transaction.TransactionService;
 import jakarta.validation.Valid;
@@ -44,6 +45,20 @@ public class TransactionController {
         return ResponseEntity
                 .created(location)
                 .body(ApiResponse.created(result));
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<ApiResponse<TransactionResponseDTO>> updateTransaction(
+            @PathVariable("id") Long transactionId,
+            @Valid @RequestBody TransactionUpdateDTO dto,
+            @AuthenticationPrincipal User user
+    ) {
+        return ResponseEntity
+                .ok(
+                        ApiResponse.success(
+                                service.update(transactionId, dto, user)
+                        )
+                );
     }
 
     @GetMapping
