@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 
 @Repository
@@ -24,6 +25,7 @@ public interface TransactionRepository
     List<Transaction> findByUserIdOrderByTransactionDateDesc(Long userId);
     List<Transaction> findByUserIdAndTransactionDateBetween(Long userId, LocalDate start, LocalDate end);
     List<Transaction> findByUserId(Long userId, Sort sort, Limit limit);
+    boolean existsByIdAndUserId(Long id, Long userId);
     List<Transaction> findByUserIdAndType(Long userId, TransactionTypeEnum type);
     List<Transaction> findByUserIdAndCategoryId(Long userId, Long categoryId);
 }

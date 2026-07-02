@@ -16,6 +16,8 @@ public record TransactionCreateDTO(
 
         String note,
 
+        Long userId,
+
         @NotNull
         Long categoryId
 ) {}

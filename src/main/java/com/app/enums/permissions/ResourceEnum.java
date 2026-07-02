@@ -3,5 +3,7 @@ package com.app.enums.permissions;
 public enum ResourceEnum {
     USERS,
     ROLES,
-    PROFILES
+    PROFILES,
+    TRANSACTIONS,
+    CATEGORIES
 }

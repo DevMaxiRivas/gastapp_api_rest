@@ -34,6 +34,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -46,8 +47,14 @@ public class TransactionServiceImpl implements TransactionService {
     private final TransactionMapper mapper;
 
     @Override
+    public Optional<Transaction> findById(Long id) {
+        return repo.findById(id);
+    }
+
+    @Override
     @Transactional
     public TransactionResponseDTO create(TransactionCreateDTO dto, User user) {
+        
         Category category = categoryService.findById(dto.categoryId())
                 .orElseThrow(() -> new ValidationRequestBodyCustomException("categoryId: is invalid.", "body.categoryId"));
 
@@ -68,6 +75,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
+    @Transactional
     public TransactionResponseDTO update(Long id, TransactionUpdateDTO dto, User user) {
         Transaction record = repo.findById(id).orElseThrow(() -> new ResourceNotFoundCustomException("transactionId: is invalid.", "URL"));
         Transaction updatedRecord = mapper.toEntity(dto, record);

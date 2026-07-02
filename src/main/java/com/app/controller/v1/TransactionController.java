@@ -1,8 +1,6 @@
 package com.app.controller.v1;
 
 import com.app.dto.v1.ApiResponse;
-import com.app.dto.v1.category.CategoryResponseDTO;
-import com.app.dto.v1.category.QueryParamsCategoryFilterDTO;
 import com.app.dto.v1.transaction.QueryParamsTransactionFilterDTO;
 import com.app.dto.v1.transaction.TransactionCreateDTO;
 import com.app.dto.v1.transaction.TransactionResponseDTO;
@@ -16,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -48,6 +47,7 @@ public class TransactionController {
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize("@securityService.canAccessTransaction(#id)")
     public ResponseEntity<ApiResponse<TransactionResponseDTO>> updateTransaction(
             @PathVariable("id") Long transactionId,
             @Valid @RequestBody TransactionUpdateDTO dto,
@@ -59,6 +59,18 @@ public class TransactionController {
                                 service.update(transactionId, dto, user)
                         )
                 );
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("@securityService.canAccessTransaction(#id)")
+    public ResponseEntity<ApiResponse<TransactionResponseDTO>> deleteTransaction(
+            @PathVariable("id") Long transactionId,
+            @AuthenticationPrincipal User user
+    ) {
+        service.delete(transactionId);
+        return ResponseEntity
+                .noContent()
+                .build();
     }
 
     @GetMapping

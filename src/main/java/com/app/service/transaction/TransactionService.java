@@ -16,8 +16,10 @@ import org.springframework.data.domain.Pageable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface TransactionService {
+    Optional<Transaction> findById(Long id);
     TransactionResponseDTO create(TransactionCreateDTO dto, User user);
     TransactionResponseDTO update(Long id, TransactionUpdateDTO dto, User user);
     List<Transaction> getMonthlyTransactions(Long userId, int month, int year);
