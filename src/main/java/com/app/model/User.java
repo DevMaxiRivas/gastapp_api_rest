@@ -1,16 +1,13 @@
 package com.app.model;
 
-import com.app.enums.user.CurrencyType;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
+import org.jspecify.annotations.NullMarked;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -49,12 +46,8 @@ public class User extends BaseEntity implements UserDetails {
     private Role role;
 
     // --- UserDetails for Auth---
-//    @Override
-//    public Collection<? extends GrantedAuthority> getAuthorities() {
-//        return List.of();
-//    }
-
     @Override
+    @NullMarked
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Set<GrantedAuthority> authorities = new HashSet<>();
             authorities.add(new SimpleGrantedAuthority("ROLE_" + this.getRole().getName()));
@@ -65,14 +58,22 @@ public class User extends BaseEntity implements UserDetails {
     }
 
     @Override
+    @NullMarked
     public String getUsername() { return email; }
 
     @Override
+    @NullMarked
     public boolean isAccountNonExpired()  { return true; }
+
     @Override
+    @NullMarked
     public boolean isAccountNonLocked()   { return true; }
+
     @Override
+    @NullMarked
     public boolean isCredentialsNonExpired() { return true; }
+
     @Override
+    @NullMarked
     public boolean isEnabled()            { return true; }
 }
