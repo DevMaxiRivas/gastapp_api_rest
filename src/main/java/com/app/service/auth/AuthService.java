@@ -2,11 +2,13 @@ package com.app.service.auth;
 
 import com.app.dto.v1.auth.*;
 import com.app.dto.v1.auth.claim.TokenClaimDTO;
+import com.app.dto.v1.email.SendEmailDTO;
 import com.app.enums.token.TokenTypeEnum;
 import com.app.exception.app.auth.jwt.InvalidJwtCustomException;
 import com.app.exception.body.ValidationRequestBodyCustomException;
 import com.app.mapper.auth.AuthMapper;
 import com.app.model.User;
+import com.app.service.email.EmailService;
 import com.app.service.user.UserService;
 import com.app.util.HashingUtils;
 import com.app.util.MapUtils;
@@ -28,6 +30,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authManager;
 
+    private final EmailService emailService;
     private final AuthMapper  authMapper;
 
     protected AuthResponse generateTokens(User user) {
@@ -46,12 +49,22 @@ public class AuthService {
         userService.removeRefreshToken(user, hashToken);
     }
 
+    protected void sendRegisterEmail(User user){
+        SendEmailDTO email = new SendEmailDTO(
+            user.getEmail(),
+            user.getUsername(),
+            "You just signed up"
+        );
+
+        emailService.sendEmail(email, "email/auth/register");
+    }
+
     public AuthResponse register(RegisterRequest request) {
         User user = userService.create(request);
         AuthResponse authResponse = generateTokens(user);
         String hashToken = HashingUtils.hashToken(authResponse.refreshToken());
         userService.addRefreshToken(user, hashToken);
-
+        sendRegisterEmail(user);
         return authResponse;
     }
 

@@ -5,10 +5,7 @@ import jakarta.annotation.Nullable;
 public record SendEmailDTO(
         String to,
 
-        String subject,
+        String recipientName,
 
-        String body,
-
-        @Nullable
-        String templatePath
+        String subject
 ){}

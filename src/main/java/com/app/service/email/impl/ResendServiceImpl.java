@@ -8,9 +8,13 @@ import com.resend.core.exception.ResendException;
 import com.resend.services.emails.model.CreateEmailOptions;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+import java.time.Year;
+
+@Service
 @RequiredArgsConstructor
 public class ResendServiceImpl implements EmailService {
     private final Resend resend;
@@ -19,17 +23,21 @@ public class ResendServiceImpl implements EmailService {
     @Value("${email.service.email-from}")
     private String from;
 
+    @Value("${spring.application.name}")
+    private String appName;
+
+    @Value("${frontend.application.public.url}")
+    private String websiteURL;
+
     @Override
-    public void sendEmail(SendEmailDTO email) {
+    public void sendEmail(SendEmailDTO email, String templatePath) {
         Context context = new Context();
-        context.setVariable("recipientName", email.to());
-        context.setVariable("message", email.body());
+        context.setVariable("appName", appName);
+        context.setVariable("recipientName", email.recipientName());
+        context.setVariable("website", websiteURL);
+        context.setVariable("currentYear", String.valueOf(Year.now().getValue()));
 
-        String html = email.body();
-
-        if(email.templatePath() != null && !email.templatePath().isEmpty()) {
-             html = templateEngine.process(email.templatePath(), context);
-        }
+        String html = templateEngine.process(templatePath, context);
 
         var params = CreateEmailOptions.builder()
                 .from(from)

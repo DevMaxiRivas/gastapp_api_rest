@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class ResendConfiguration {
-    @Value("${email.service.api-key}")
+    @Value("${email.service.apikey}")
     private String apiKey;
 
     @Bean
