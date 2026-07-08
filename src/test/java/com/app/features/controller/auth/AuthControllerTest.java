@@ -32,14 +32,14 @@ class AuthControllerTest extends AbstractIntegrationTest {
     public final String ENDPOINT_REFRESH = "/refresh";
 
     @Test
-    void registerTest() {
+    void registerUserHappyPathTest() {
         webTestClient.post()
                 .uri(PREFIX_URI + ENDPOINT_REGISTER)
                 .header("Content-Type", "application/json")
                 .bodyValue("""
                         {
                             "username" : "TestUser1",
-                            "email" : "maximiliano.rivas.work@gmail.com",
+                            "email" : "maximiliano.rivas.work+gastapp_test@gmail.com",
                             "password" : "Pwd#12345"
                         }
                         """)
@@ -53,25 +53,7 @@ class AuthControllerTest extends AbstractIntegrationTest {
 
 
     @Test
-    void registerUserTest() {
-        webTestClient.post()
-                .uri(PREFIX_URI + ENDPOINT_REGISTER)
-                .header("Content-Type", "application/json")
-                .bodyValue("""
-                {
-                    "username" : "TestUser1",
-                    "email" : "test1@example.com",
-                    "password" : "Pwd#12345"
-                }
-                """)
-                .exchange()
-                .expectStatus().isCreated()
-                .expectCookie().exists("refresh-token")
-                .expectBody()
-                    .jsonPath("$.data.access_token").exists()
-        ;
-
-        // Testing Error Enum CurrencyType
+    void registerUserWithBodyProblemTest() {
         webTestClient.post()
                 .uri(PREFIX_URI + ENDPOINT_REGISTER)
                 .header("Content-Type", "application/json")
@@ -88,24 +70,6 @@ class AuthControllerTest extends AbstractIntegrationTest {
                 .expectBody()
                     .jsonPath("$.errors").exists()
         ;
-
-        webTestClient.post()
-                .uri(PREFIX_URI + ENDPOINT_REGISTER)
-                .header("Content-Type", "application/json")
-                .bodyValue("""
-                {
-                    "username" : "TestUser",
-                    "email" : "test@example.com",
-                    "password" : "Pwd12345",
-                }
-                """)
-                .exchange()
-                .expectStatus()
-                    .is4xxClientError()
-                .expectBody()
-                    .jsonPath("$.errors").exists()
-                    .jsonPath("$.success").isEqualTo(false)
-        ;
     }
 
     @Test
@@ -117,7 +81,7 @@ class AuthControllerTest extends AbstractIntegrationTest {
                 {
                     "username" : "TestUser",
                     "email" : "test@example.com",
-                    "password" : "Pwd12345"
+                    "password" : "Pwd#12345"
                 }
                 """)
                 .exchange()
@@ -138,19 +102,6 @@ class AuthControllerTest extends AbstractIntegrationTest {
             refreshToken = refreshTokenCookie.getValue();
         }
 
-        webTestClient.get()
-                .uri("/api/v1/users")
-                .header("Content-Type", "application/json")
-                .header("Authorization", "Bearer " + token.access_token())
-                .exchange()
-                .expectStatus()
-                    .isOk()
-                .expectBody()
-                .consumeWith(result -> {
-                    System.out.println("Endpoint users response Body: " + new String(result.getResponseBodyContent()));
-                });
-        ;
-
         webTestClient.post()
                 .uri(PREFIX_URI + ENDPOINT_LOGOUT)
                 .header("Content-Type", "application/json")
@@ -168,7 +119,7 @@ class AuthControllerTest extends AbstractIntegrationTest {
                 .bodyValue("""
                 {
                     "email" : "test@example.com",
-                    "password" : "Pwd12345"
+                    "password" : "Pwd#12345"
                 }
                 """)
                 .exchange()

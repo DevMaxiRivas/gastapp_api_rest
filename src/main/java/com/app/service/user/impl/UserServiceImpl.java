@@ -3,6 +3,7 @@ package com.app.service.user.impl;
 import com.app.dto.v1.auth.RegisterRequest;
 import com.app.dto.v1.user.QueryParamsUserFilterDTO;
 import com.app.dto.v1.user.UserResponseDTO;
+import com.app.event.auth.UserCreatedEvent;
 import com.app.exception.body.ValidationRequestBodyCustomException;
 import com.app.exception.resource.ResourceNotFoundCustomException;
 import com.app.mapper.user.UserMapper;
@@ -15,6 +16,7 @@ import com.app.specification.user.UserSpecification;
 import com.app.util.HashingUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -31,9 +33,16 @@ public class UserServiceImpl implements UserService {
     private final UserMapper mapper;
     private final RoleService roleService;
 
+    private final ApplicationEventPublisher eventPublisher;
+
     @Override
     public Optional<User> findById(Long id) {
         return repo.findById(id);
+    }
+
+    @Override
+    public Optional<User> findByUsername(String username) {
+        return repo.findByUsername(username);
     }
 
     @Override
@@ -66,6 +75,11 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new RuntimeException("Default role not found"));
         user.setRole(defaultRole);
         repo.save(user);
+
+        eventPublisher.publishEvent(
+                new UserCreatedEvent(mapper.toEventDto(user))
+        );
+
         return user;
     }
 

@@ -48,6 +48,7 @@ public class ResendServiceImpl implements EmailService {
 
         try {
             resend.emails().send(params);
+            System.out.println("Sending email");
         } catch (ResendException e) {
             throw new ResendCustomException(e);
         }

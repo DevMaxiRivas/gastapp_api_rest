@@ -1,7 +1,9 @@
 package com.app.mapper.user;
 
 import com.app.dto.v1.auth.RegisterRequest;
+import com.app.dto.v1.user.UserEventDTO;
 import com.app.dto.v1.user.UserResponseDTO;
+import com.app.event.auth.UserCreatedEvent;
 import com.app.mapper.config.GlobalMapperConfig;
 import com.app.mapper.helper.StringMapper;
 import com.app.mapper.profile.ProfileMapper;
@@ -33,6 +35,8 @@ public interface UserMapper {
             expression = "java(user.getUsernameApp())"
     )
     UserResponseDTO toDto(User user);
+
+    UserEventDTO toEventDto(User user);
 
     @Mapping(
             target = "email",
