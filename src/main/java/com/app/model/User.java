@@ -45,6 +45,8 @@ public class User extends BaseEntity implements UserDetails {
     @JoinColumn(name = "role_id", referencedColumnName = "id", nullable = false)
     private Role role;
 
+    public String getUsernameApp() { return username; }
+
     // --- UserDetails for Auth---
     @Override
     @NullMarked

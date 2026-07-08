@@ -28,6 +28,10 @@ public interface UserMapper {
         source = "email",
         qualifiedBy = MaskEmail.class
     )
+    @Mapping(
+            target = "username",
+            expression = "java(user.getUsernameApp())"
+    )
     UserResponseDTO toDto(User user);
 
     @Mapping(

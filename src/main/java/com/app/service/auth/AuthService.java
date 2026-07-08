@@ -88,7 +88,7 @@ public class AuthService {
     @Transactional(dontRollbackOn = ExpiredJwtException.class)
     public void logout(String refreshToken) {
         try {
-            String email = jwtService.extractEmail(new Token(refreshToken, TokenTypeEnum.REFRESH_TOKEN));
+            String email = jwtService.extractSubject(new Token(refreshToken, TokenTypeEnum.REFRESH_TOKEN));
             removeRefreshToken(email, refreshToken);
         } catch (Exception e) {
             if (e instanceof ExpiredJwtException) {
@@ -102,7 +102,7 @@ public class AuthService {
     @Transactional(dontRollbackOn = ExpiredJwtException.class)
     public AccessTokenResponse refresh(String refreshToken) {
         try {
-            String email = jwtService.extractEmail(new Token(refreshToken, TokenTypeEnum.REFRESH_TOKEN));
+            String email = jwtService.extractSubject(new Token(refreshToken, TokenTypeEnum.REFRESH_TOKEN));
             User user = userService.findByEmail(email)
                     .orElseThrow(() -> new ValidationRequestBodyCustomException("User not found", "token.email"));
 

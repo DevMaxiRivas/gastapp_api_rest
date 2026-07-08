@@ -46,13 +46,12 @@ public class JwtService {
     }
 
 
-    public String generateToken(User user,
-                                Map<String, Object> data,
-                                TokenTypeEnum tokenType) {
+    public String generateToken(
+            User user,
+            Map<String, Object> data,
+            TokenTypeEnum tokenType
+    ) {
         String role = user.getRole().getName();
-        Set<String> permissions = user.getRole().getPermissions().stream()
-                .map(Permission::getName)
-                .collect(Collectors.toSet());
 
         return Jwts.builder()
                 .subject(user.getEmail())
@@ -63,12 +62,12 @@ public class JwtService {
                 .compact();
     }
 
-    public String extractEmail(Token token) {
+    public String extractSubject(Token token) {
         return extractClaim(token, Claims::getSubject);
     }
 
     public boolean isTokenValid(Token token, UserDetails user) {
-        return extractEmail(token).equals(user.getUsername()) && !isTokenExpired(token);
+        return extractSubject(token).equals(user.getUsername()) && !isTokenExpired(token);
     }
 
     private boolean isTokenExpired(Token token) {

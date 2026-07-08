@@ -13,6 +13,7 @@ import java.util.Optional;
 public interface UserService {
     Optional<User> findById(Long id);
     Optional<User> findByEmail(String email);
+    Optional<User> findByUsername(String username);
     Page<UserResponseDTO> getUsersPageable(Pageable pageable);
     Page<UserResponseDTO> getFilteredUsersPageable(QueryParamsUserFilterDTO filters, Pageable pageable);
     User create(RegisterRequest dto);
