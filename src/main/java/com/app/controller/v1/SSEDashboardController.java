@@ -1,4 +1,4 @@
-package com.app.sse.v1;
+package com.app.controller.v1;
 
 import com.app.model.User;
 import com.app.service.SSE.SseNotificationService;
