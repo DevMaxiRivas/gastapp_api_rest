@@ -103,10 +103,9 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     @Transactional
     public void delete(Long id) {
-        if (!repo.existsById(id)) {
-            throw new ResourceNotFoundCustomException("Transaction not found", "url");
-        }
-        repo.deleteById(id);
+        Transaction record = repo.findById(id).orElseThrow(() -> new ResourceNotFoundCustomException("Transaction not found", "url_parameter"));
+        record.softDelete();
+        repo.save(record);
     }
 
     @Override
