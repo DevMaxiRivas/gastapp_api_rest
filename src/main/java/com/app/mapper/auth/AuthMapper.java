@@ -28,5 +28,9 @@ public interface AuthMapper {
         target = "role",
         source = "user"
     )
+    @Mapping(
+        target = "username",
+        expression = "java(user.getUsernameApp())"
+    )
     TokenClaimDTO toDto(User user);
 }
