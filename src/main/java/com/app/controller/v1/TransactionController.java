@@ -49,14 +49,14 @@ public class TransactionController {
     @PatchMapping("/{id}")
     @PreAuthorize("@securityService.canAccessTransaction(#id)")
     public ResponseEntity<ApiResponse<TransactionResponseDTO>> updateTransaction(
-            @PathVariable("id") Long transactionId,
+            @PathVariable Long id,
             @Valid @RequestBody TransactionUpdateDTO dto,
             @AuthenticationPrincipal User user
     ) {
         return ResponseEntity
                 .ok(
                         ApiResponse.success(
-                                service.update(transactionId, dto, user)
+                                service.update(id, dto, user)
                         )
                 );
     }
@@ -64,10 +64,10 @@ public class TransactionController {
     @DeleteMapping("/{id}")
     @PreAuthorize("@securityService.canAccessTransaction(#id)")
     public ResponseEntity<ApiResponse<TransactionResponseDTO>> deleteTransaction(
-            @PathVariable("id") Long transactionId,
+            @PathVariable Long id,
             @AuthenticationPrincipal User user
     ) {
-        service.delete(transactionId);
+        service.delete(id);
         return ResponseEntity
                 .noContent()
                 .build();
