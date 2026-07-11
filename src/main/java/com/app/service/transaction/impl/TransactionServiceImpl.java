@@ -9,6 +9,7 @@ import com.app.dto.v1.transaction.TransactionResponseDTO;
 import com.app.dto.v1.transaction.TransactionUpdateDTO;
 import com.app.enums.transaction.TransactionTypeEnum;
 import com.app.event.transaction.TransactionCreatedEvent;
+import com.app.event.transaction.TransactionUpdatedEvent;
 import com.app.exception.body.ValidationRequestBodyCustomException;
 import com.app.exception.resource.ResourceNotFoundCustomException;
 import com.app.mapper.transaction.TransactionMapper;
@@ -89,6 +90,13 @@ public class TransactionServiceImpl implements TransactionService {
         }
 
         repo.save(updatedRecord);
+
+        eventPublisher.publishEvent(
+                new TransactionUpdatedEvent(
+                        updatedRecord.getUser().getId().toString()
+                )
+        );
+
         return mapper.toDto(updatedRecord);
     }
 

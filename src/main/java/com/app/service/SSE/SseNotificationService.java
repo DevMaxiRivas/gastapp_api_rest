@@ -64,18 +64,15 @@ public class SseNotificationService {
         });
     }
 
-    @Async
-    @EventListener
-    public void handleTransactionCreated(TransactionCreatedEvent event) {
-        Map<String, SseEmitter> userConnections = userEmitters.get(event.userId());
+    public void notify(String keyEmitters, String eventName, String eventData) {
+        Map<String, SseEmitter> userConnections = userEmitters.get(keyEmitters);
         if (userConnections != null) {
-//            System.out.println(userConnections.size() + " connections created");
             userConnections.forEach((id, emitter) -> {
                 try {
                     emitter.send(
-                        SseEmitter.event()
-                        .name("transaction-created")
-                        .data("New transaction saved")
+                            SseEmitter.event()
+                                    .name(eventName)
+                                    .data(eventData)
                     );
                 } catch (Exception e) {
                     emitter.complete();
