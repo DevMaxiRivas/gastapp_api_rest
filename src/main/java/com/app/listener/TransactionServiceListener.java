@@ -19,7 +19,7 @@ public class TransactionServiceListener {
     public void handleTransactionCreated(TransactionCreatedEvent event) {
         sseNotificationService.notify(
                 event.userId(),
-                "transaction-create",
+                "transaction-created",
                 "New transaction saved"
         );
     }
@@ -29,7 +29,7 @@ public class TransactionServiceListener {
     public void handleTransactionUpdated(TransactionUpdatedEvent event) {
         sseNotificationService.notify(
                 event.userId(),
-                "transaction-update",
+                "transaction-updated",
                 "New transaction updated"
         );
     }
