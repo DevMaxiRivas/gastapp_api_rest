@@ -3,6 +3,7 @@ import com.app.enums.transaction.TransactionTypeEnum;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.SQLDelete;
 
 import java.math.BigDecimal;
@@ -14,7 +15,8 @@ import java.time.LocalDate;
 @SQLDelete(sql = "UPDATE transactions SET deletedAt = CURRENT_TIMESTAMP WHERE id = ?")
 // Necessary for service
 // @SQLRestriction("deleted_at IS NULL")
-@Filter(name = "softDeleteFilter", condition = "(:isDeleted = false and deleted_at IS NULL)")
+@FilterDef(name = "softDeleteFilter")
+@Filter(name = "softDeleteFilter", condition = "(deleted_at IS NULL)")
 @Getter
 @Setter
 @NoArgsConstructor

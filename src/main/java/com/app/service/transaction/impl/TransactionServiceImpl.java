@@ -1,5 +1,6 @@
 package com.app.service.transaction.impl;
 
+import com.app.aspect.database.filter.ApplySoftDelete;
 import com.app.dto.v1.dashboard.transaction.QueryParamsFilterDailyBalanceDTO;
 import com.app.dto.v1.dashboard.transaction.TransactionDailyBalanceDTO;
 import com.app.dto.v1.dashboard.transaction.TransactionHistoryByMonthDTO;
@@ -9,6 +10,7 @@ import com.app.dto.v1.transaction.TransactionResponseDTO;
 import com.app.dto.v1.transaction.TransactionUpdateDTO;
 import com.app.enums.transaction.TransactionTypeEnum;
 import com.app.event.transaction.TransactionCreatedEvent;
+import com.app.event.transaction.TransactionDeletedEvent;
 import com.app.event.transaction.TransactionUpdatedEvent;
 import com.app.exception.body.ValidationRequestBodyCustomException;
 import com.app.exception.resource.ResourceNotFoundCustomException;
@@ -20,6 +22,7 @@ import com.app.repository.TransactionRepository;
 import com.app.service.category.CategoryService;
 import com.app.service.transaction.TransactionService;
 import com.app.specification.transaction.TransactionSpecification;
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -101,6 +104,21 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
+    @Transactional
+    public void delete(Long id) {
+        Transaction record = repo.findById(id).orElseThrow(() -> new ResourceNotFoundCustomException("Transaction not found", "url_parameter"));
+        record.softDelete();
+        repo.save(record);
+
+        eventPublisher.publishEvent(
+                new TransactionDeletedEvent(
+                        record.getUser().getId().toString()
+                )
+        );
+    }
+
+    @Override
+    @ApplySoftDelete
     public List<Transaction> getMonthlyTransactions(Long userId, int month, int year) {
         LocalDate start = LocalDate.of(year, month, 1);
         LocalDate end = start.withDayOfMonth(start.lengthOfMonth());
@@ -108,24 +126,19 @@ public class TransactionServiceImpl implements TransactionService {
         return repo.findByUserIdAndTransactionDateBetween(userId, start, end);
     }
 
-    @Override
-    @Transactional
-    public void delete(Long id) {
-        Transaction record = repo.findById(id).orElseThrow(() -> new ResourceNotFoundCustomException("Transaction not found", "url_parameter"));
-        record.softDelete();
-        repo.save(record);
-    }
 
     @Override
+    @ApplySoftDelete
     public Page<TransactionResponseDTO> getFilteredPageable(QueryParamsTransactionFilterDTO filters, Pageable pageable, User user){
         Long userId = (Objects.equals(user.getRole().getName(),"USER")) ? user.getId() : filters.userId();
-
         Specification<Transaction> spec = TransactionSpecification.filterBy(filters, userId);
+
         return repo.findAll(spec, pageable)
                 .map(mapper::toDto);
     }
 
     @Override
+    @ApplySoftDelete
     public List<TransactionResponseDTO> getRecentTransactions(Long userId, int quantity) {
         Limit limit = Limit.of(quantity);
         List<Sort.Order> orders = new ArrayList<>();
@@ -142,16 +155,19 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
+    @ApplySoftDelete
     public BigDecimal getTotalAmount(Long userId, LocalDate fromDate, LocalDate toDate, TransactionTypeEnum type) {
         return repo.getTotalAmount(userId, fromDate, toDate, type);
     }
 
     @Override
+    @ApplySoftDelete
     public List<TransactionHistoryByMonthDTO> getTransactionHistoryByMonth(Long userId, LocalDate startDate, LocalDate endDate) {
         return repo.getTransactionHistoryByMonth(userId, startDate, endDate);
     }
 
     @Override
+    @ApplySoftDelete
     public List<TransactionDailyBalanceDTO> getDailyBalance(Long userId, QueryParamsFilterDailyBalanceDTO filter) {
         return repo.getDailyBalance(userId, filter);
     }

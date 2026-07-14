@@ -1,6 +1,7 @@
 package com.app.listener;
 
 import com.app.event.transaction.TransactionCreatedEvent;
+import com.app.event.transaction.TransactionDeletedEvent;
 import com.app.event.transaction.TransactionUpdatedEvent;
 import com.app.service.SSE.SseNotificationService;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,16 @@ public class TransactionServiceListener {
                 event.userId(),
                 "transaction-updated",
                 "New transaction updated"
+        );
+    }
+
+    @Async
+    @EventListener
+    public void handleTransactionDeleted(TransactionDeletedEvent event) {
+        sseNotificationService.notify(
+                event.userId(),
+                "transaction-deleted",
+                "New transaction deleted"
         );
     }
 }
