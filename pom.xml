@@ -192,6 +192,11 @@
 			<artifactId>thymeleaf-layout-dialect</artifactId>
 		</dependency>
 
+		<!--	Monitoring Tools for Applications	-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>

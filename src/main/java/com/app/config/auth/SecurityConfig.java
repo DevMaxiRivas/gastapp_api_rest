@@ -87,6 +87,9 @@ public class SecurityConfig {
                                 )
                                 .permitAll()
 
+                                .requestMatchers("/actuator/**")
+                                .hasRole("ADMIN")
+
                                 // Enable the sending of asynchronous events
                                 .dispatcherTypeMatchers(DispatcherType.ASYNC).permitAll()
                                 // Authenticate all other requests
