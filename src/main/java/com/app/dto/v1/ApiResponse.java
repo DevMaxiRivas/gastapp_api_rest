@@ -33,12 +33,11 @@ public class ApiResponse<T> {
         return new ApiResponse<>(page.getContent(), meta, HttpStatus.OK.value());
     }
 
-
     public static <T> ApiResponse<T> created(T data) {
         return new ApiResponse<>(data, null, HttpStatus.CREATED.value());
     }
 
-    public static <T> ApiResponse<T> noContent(int statusCode) {
+    public static <T> ApiResponse<T> noContent() {
         return new ApiResponse<>(null, null, HttpStatus.NO_CONTENT.value());
     }
 }
