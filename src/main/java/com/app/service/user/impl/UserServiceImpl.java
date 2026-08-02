@@ -1,11 +1,11 @@
 package com.app.service.user.impl;
 
+import com.app.dto.v1.auth.ConfirmResetPasswordRequest;
 import com.app.dto.v1.auth.RegisterRequest;
 import com.app.dto.v1.user.QueryParamsUserFilterDTO;
 import com.app.dto.v1.user.UserResponseDTO;
 import com.app.event.auth.UserCreatedEvent;
 import com.app.exception.body.ValidationRequestBodyCustomException;
-import com.app.exception.resource.ResourceNotFoundCustomException;
 import com.app.mapper.user.UserMapper;
 import com.app.model.Role;
 import com.app.model.User;
@@ -13,7 +13,6 @@ import com.app.repository.UserRepository;
 import com.app.service.role.RoleService;
 import com.app.service.user.UserService;
 import com.app.specification.user.UserSpecification;
-import com.app.util.HashingUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -99,5 +98,12 @@ public class UserServiceImpl implements UserService {
         repo.removeToken(user.getId(), hashToken);
     }
 
-
+    @Override
+    @Transactional
+    public void resetPasswordUser(User user, ConfirmResetPasswordRequest request) {
+        ConfirmResetPasswordRequest mappedData = mapper.toValidConfirmResetPasswordRequest(request);
+        user.setPassword(mappedData.newPassword());
+        repo.removeAllTokens(user.getId());
+        repo.save(user);
+    }
 }

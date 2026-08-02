@@ -43,6 +43,18 @@ CREATE TABLE users (
       ON DELETE CASCADE
 );
 
+CREATE TABLE password_reset_tokens (
+   id BIGSERIAL PRIMARY KEY,
+   user_id BIGINT NOT NULL,
+   token TEXT,
+   expired_at TIMESTAMP NOT NULL,
+
+   CONSTRAINT fk_profiles_user
+       FOREIGN KEY (user_id)
+           REFERENCES users(id)
+           ON DELETE CASCADE
+);
+
 CREATE TABLE profiles (
   user_id BIGINT PRIMARY KEY,
 

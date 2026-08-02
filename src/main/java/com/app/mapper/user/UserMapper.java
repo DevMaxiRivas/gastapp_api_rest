@@ -1,5 +1,6 @@
 package com.app.mapper.user;
 
+import com.app.dto.v1.auth.ConfirmResetPasswordRequest;
 import com.app.dto.v1.auth.RegisterRequest;
 import com.app.dto.v1.user.UserEventDTO;
 import com.app.dto.v1.user.UserResponseDTO;
@@ -55,4 +56,11 @@ public interface UserMapper {
     User toEntity(RegisterRequest dto);
 
     List<UserResponseDTO> toDtoList(List<User> users);
+
+    @Mapping(
+            target = "newPassword",
+            source = "newPassword",
+            qualifiedBy = EncodePassword.class
+    )
+    ConfirmResetPasswordRequest toValidConfirmResetPasswordRequest(ConfirmResetPasswordRequest request);
 }

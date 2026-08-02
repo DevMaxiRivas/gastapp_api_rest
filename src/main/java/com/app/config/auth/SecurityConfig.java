@@ -78,6 +78,8 @@ public class SecurityConfig {
                                 // Permit multiple specific paths
                                 .requestMatchers(
                                         "/",
+                                        "/api/v1/forgot-password",
+                                        "/api/v1/reset-password/**",
                                         "/api/v1/auth/**",
                                         "/api/v1/greet/**",
                                         "/swagger-ui/**",

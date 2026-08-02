@@ -1,5 +1,6 @@
 package com.app.service.user;
 
+import com.app.dto.v1.auth.ConfirmResetPasswordRequest;
 import com.app.dto.v1.auth.RegisterRequest;
 import com.app.dto.v1.user.QueryParamsUserFilterDTO;
 import com.app.dto.v1.user.UserResponseDTO;
@@ -19,4 +20,5 @@ public interface UserService {
     User create(RegisterRequest dto);
     void addRefreshToken(User user, String hashToken);
     void removeRefreshToken(User user, String hashToken);
+    void resetPasswordUser(User user, ConfirmResetPasswordRequest request);
 }
