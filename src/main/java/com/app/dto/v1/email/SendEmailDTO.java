@@ -7,5 +7,8 @@ public record SendEmailDTO(
 
         String recipientName,
 
-        String subject
+        String subject,
+
+        @Nullable
+        String redirectLink
 ){}

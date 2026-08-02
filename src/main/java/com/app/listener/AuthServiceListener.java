@@ -7,21 +7,23 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.thymeleaf.context.Context;
 
 @Component
 @RequiredArgsConstructor
-public class EmailServiceListener {
-    private final EmailService emailService;
+public class AuthServiceListener {
+    private  final EmailService emailService;
 
     @Async
     @EventListener
     public void handleUserCreatedEvent(UserCreatedEvent event) {
         SendEmailDTO email = new SendEmailDTO(
-            event.user().email(),
-            event.user().username(),
-            "You just signed up"
+                event.user().email(),
+                event.user().username(),
+                "You just signed up",
+                null
         );
 
-        emailService.sendEmail(email, "email/auth/register");
+        emailService.sendEmail(email, "email/auth/register", new Context());
     }
 }

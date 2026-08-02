@@ -29,15 +29,20 @@ public class ResendServiceImpl implements EmailService {
     @Value("${frontend.application.public.url}")
     private String websiteURL;
 
-    @Override
-    public void sendEmail(SendEmailDTO email, String templatePath) {
-        Context context = new Context();
+    private Context addRequiredVariablesToContext(Context context, SendEmailDTO email){
         context.setVariable("appName", appName);
         context.setVariable("recipientName", email.recipientName());
-        context.setVariable("website", websiteURL);
         context.setVariable("currentYear", String.valueOf(Year.now().getValue()));
 
-        String html = templateEngine.process(templatePath, context);
+        if(email.redirectLink() != null)
+            context.setVariable("redirectLink", websiteURL + email.redirectLink());
+
+        return context;
+    }
+
+    @Override
+    public void sendEmail(SendEmailDTO email, String templatePath, Context context) {
+        String html = templateEngine.process(templatePath, addRequiredVariablesToContext(context, email));
 
         var params = CreateEmailOptions.builder()
                 .from(from)
