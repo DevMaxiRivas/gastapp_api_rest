@@ -12,6 +12,7 @@ import com.app.exception.header.MissingHeaderCustomException;
 import com.app.exception.app.auth.jwt.ExpiredJwtCustomException;
 
 import com.app.exception.method.HttpRequestMethodNotSupportedCustomException;
+import com.app.exception.query_params.MissingServletRequestParameterCustomException;
 import com.app.exception.query_params.PropertyReferenceCustomException;
 import com.app.exception.resource.ResourceNotFoundCustomException;
 import com.app.exception.validation.MethodArgumentNotValidCustomException;
@@ -30,6 +31,7 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestCookieException;
 import org.springframework.web.bind.MissingRequestHeaderException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.async.AsyncRequestNotUsableException;
@@ -52,6 +54,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleNotReadableBody(HttpMessageNotReadableException ex, HttpServletRequest request) {
         return (new NotReadableBodyCustomException(ex)).buildErrorResponse(request);
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ErrorResponse> handleMissingRequestParam(MissingServletRequestParameterException ex, HttpServletRequest request) {
+        return (new MissingServletRequestParameterCustomException(ex)).buildErrorResponse(request);
     }
 
     @ExceptionHandler(MissingRequestHeaderException.class)
