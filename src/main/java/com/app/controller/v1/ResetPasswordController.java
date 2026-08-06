@@ -17,7 +17,7 @@ public class ResetPasswordController {
 
     @GetMapping("/reset-password")
     public ResponseEntity<ApiResponse<Void>> validateToken(@RequestParam("token") String token) {
-        service.validateToken(token);
+        service.validateToken(token, false);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 

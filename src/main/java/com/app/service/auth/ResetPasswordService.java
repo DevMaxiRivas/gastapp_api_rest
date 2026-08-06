@@ -8,14 +8,13 @@ import com.app.model.PasswordResetToken;
 import com.app.model.User;
 import com.app.repository.PasswordResetTokenRepository;
 import com.app.service.user.UserService;
-import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Base64;
 
 @Service
@@ -46,7 +45,7 @@ public class ResetPasswordService {
                 ));
 
         PasswordResetToken token = PasswordResetToken.builder()
-                .expiredAt(LocalDate.now().atStartOfDay().plusMinutes(EXPIRATION_TIME))
+                .expiredAt(LocalDateTime.now().plusMinutes(EXPIRATION_TIME))
                 .token(makeResetToken())
                 .user(user)
                 .build();
@@ -59,11 +58,11 @@ public class ResetPasswordService {
     }
 
     @Transactional(dontRollbackOn = ValidationRequestBodyCustomException.class)
-    public PasswordResetToken validateToken(String token) {
+    public PasswordResetToken validateToken(String token, boolean includedInBody) {
         PasswordResetToken resetToken = repo.findByToken(token)
                 .orElseThrow(() -> new ValidationRequestBodyCustomException(
                 "token: No users with this token were found.",
-                "query_param.token"
+                (includedInBody ? "body" : "query_param") + ".token"
         ));
 
         if (resetToken.isExpired()) {
@@ -79,7 +78,7 @@ public class ResetPasswordService {
 
     @Transactional
     public void resetPassword(ConfirmResetPasswordRequest request) {
-        PasswordResetToken resetToken = validateToken(request.token());
+        PasswordResetToken resetToken = validateToken(request.token(), true);
 
         User user = resetToken.getUser();
         userService.resetPasswordUser(user, request);
