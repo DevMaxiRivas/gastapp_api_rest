@@ -22,7 +22,6 @@ import com.app.repository.TransactionRepository;
 import com.app.service.category.CategoryService;
 import com.app.service.transaction.TransactionService;
 import com.app.specification.transaction.TransactionSpecification;
-import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -51,8 +50,11 @@ public class TransactionServiceImpl implements TransactionService {
     private final TransactionMapper mapper;
 
     @Override
-    public Optional<Transaction> findById(Long id) {
-        return repo.findById(id);
+    public TransactionResponseDTO getById(Long id) {
+        Transaction record = repo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundCustomException("We have no record of a transaction with that ID.", "param"));
+
+        return mapper.toDto(record);
     }
 
     @Override
@@ -80,7 +82,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     @Transactional
-    public TransactionResponseDTO update(Long id, TransactionUpdateDTO dto, User user) {
+    public TransactionResponseDTO update(Long id, TransactionUpdateDTO dto) {
         Transaction record = repo.findById(id).orElseThrow(() -> new ResourceNotFoundCustomException("transactionId: is invalid.", "URL"));
         Transaction updatedRecord = mapper.toEntity(dto, record);
 

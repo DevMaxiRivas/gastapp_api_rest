@@ -50,13 +50,12 @@ public class TransactionController {
     @PreAuthorize("@securityService.canAccessTransaction(#id)")
     public ResponseEntity<ApiResponse<TransactionResponseDTO>> updateTransaction(
             @PathVariable Long id,
-            @Valid @RequestBody TransactionUpdateDTO dto,
-            @AuthenticationPrincipal User user
+            @Valid @RequestBody TransactionUpdateDTO dto
     ) {
         return ResponseEntity
                 .ok(
                         ApiResponse.success(
-                                service.update(id, dto, user)
+                                service.update(id, dto)
                         )
                 );
     }
@@ -64,10 +63,20 @@ public class TransactionController {
     @DeleteMapping("/{id}")
     @PreAuthorize("@securityService.canAccessTransaction(#id)")
     public ResponseEntity<ApiResponse<TransactionResponseDTO>> deleteTransaction(
-            @PathVariable Long id,
-            @AuthenticationPrincipal User user
+            @PathVariable Long id
     ) {
         service.delete(id);
+        return ResponseEntity
+                .noContent()
+                .build();
+    }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("@securityService.canAccessTransaction(#id)")
+    public ResponseEntity<ApiResponse<TransactionResponseDTO>> getTransaction(
+            @PathVariable Long id
+    ) {
+        service.getById(id);
         return ResponseEntity
                 .noContent()
                 .build();

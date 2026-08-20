@@ -19,9 +19,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface TransactionService {
-    Optional<Transaction> findById(Long id);
+    TransactionResponseDTO getById(Long id);
     TransactionResponseDTO create(TransactionCreateDTO dto, User user);
-    TransactionResponseDTO update(Long id, TransactionUpdateDTO dto, User user);
+    TransactionResponseDTO update(Long id, TransactionUpdateDTO dto);
     List<Transaction> getMonthlyTransactions(Long userId, int month, int year);
     void delete(Long id);
     Page<TransactionResponseDTO> getFilteredPageable(QueryParamsTransactionFilterDTO filters, Pageable pageable, User user);
