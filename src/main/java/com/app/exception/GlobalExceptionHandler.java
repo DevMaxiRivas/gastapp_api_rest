@@ -5,6 +5,7 @@ import com.app.dto.v1.error.ErrorResponse;
 import com.app.exception.app.auth.AuthorizationDeniedCustomException;
 import com.app.exception.app.auth.BadCredentialsCustomException;
 import com.app.exception.app.auth.jwt.InvalidJwtCustomException;
+import com.app.exception.app.external_service.email.resend.ResendCustomException;
 import com.app.exception.body.HttpMediaTypeNotSupportedCustomException;
 import com.app.exception.body.NotReadableBodyCustomException;
 import com.app.exception.cookie.MissingCookieCustomException;
@@ -17,6 +18,7 @@ import com.app.exception.query_params.PropertyReferenceCustomException;
 import com.app.exception.resource.ResourceNotFoundCustomException;
 import com.app.exception.validation.MethodArgumentNotValidCustomException;
 import com.app.exception.validation.MissingServletRequestPartCustomException;
+import com.resend.core.exception.ResendException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -120,6 +122,13 @@ public class GlobalExceptionHandler {
         return exception.buildErrorResponse(request);
     }
 
+    // Service Exceptions
+    @ExceptionHandler(ResendException.class)
+    public ResponseEntity<ErrorResponse> handleResendException(ResendException ex, HttpServletRequest request) {
+        ResendCustomException exception = new ResendCustomException(ex);
+        exception.printLogs();
+        return exception.buildErrorResponse(request);
+    }
     // Ignore exception for threads
     @ExceptionHandler({AsyncRequestTimeoutException.class, AsyncRequestNotUsableException.class})
     public void handleAsyncRequestTimeoutException(Exception ex, HttpServletRequest response) {
