@@ -300,23 +300,23 @@
 						</goals>
 					</execution>
 				</executions>
-				<configuration>
-					<files>
-						<file>${project.basedir}/.env</file>
-					</files>
-				</configuration>
+<!--				<configuration>-->
+<!--					<files>-->
+<!--						<file>${project.basedir}/.env</file>-->
+<!--					</files>-->
+<!--				</configuration>-->
 			</plugin>
 
-			<plugin>
-				<groupId>org.flywaydb</groupId>
-				<artifactId>flyway-maven-plugin</artifactId>
-				<configuration>
-					<cleanDisabled>false</cleanDisabled>
-					<url>${env.DB_URL}</url>
-					<user>${env.DB_USER}</user>
-					<password>${env.DB_PASSWORD}</password>
-				</configuration>
-			</plugin>
+<!--			<plugin>-->
+<!--				<groupId>org.flywaydb</groupId>-->
+<!--				<artifactId>flyway-maven-plugin</artifactId>-->
+<!--				<configuration>-->
+<!--					<cleanDisabled>false</cleanDisabled>-->
+<!--					<url>${env.DB_URL}</url>-->
+<!--					<user>${env.DB_USER}</user>-->
+<!--					<password>${env.DB_PASSWORD}</password>-->
+<!--				</configuration>-->
+<!--			</plugin>-->
 		</plugins>
 	</build>
 
